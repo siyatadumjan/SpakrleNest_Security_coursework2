@@ -1,9 +1,9 @@
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { createProductApi, deleteProductApi, getAllProductsApi, isAuthenticated, clearAuthToken } from '../../../apis/Api';
+import { createProductApi, deleteProductApi, getAllProductsApi, getAllOrdersApi, isAuthenticated, clearAuthToken, getDashboardNotificationsApi } from '../../../apis/Api';
 import './AdminDashboard.css'; // Import the CSS file
 
 
@@ -18,7 +18,11 @@ const AdminDashboard = () => {
   const [productImage, setProductImage] = useState(null);
   const [productQuantity, setProductQuantity] = useState('');
   const [previewImage, setPreviewImage] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
   const navigate = useNavigate();
+  const notificationRef = useRef(null);
 
   useEffect(() => {
     // Check if user is authenticated before fetching products
@@ -42,6 +46,143 @@ const AdminDashboard = () => {
         }
       });
   }, [navigate]);
+
+  // Close notification dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Fetch notifications from backend data
+  const fetchNotifications = async () => {
+    setIsLoadingNotifications(true);
+    try {
+      const dashboardData = await getDashboardNotificationsApi();
+      const generatedNotifications = generateNotificationsFromData(dashboardData);
+      setNotifications(generatedNotifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      // Fallback to empty notifications on error
+      setNotifications([]);
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  // Generate notifications from backend data
+  const generateNotificationsFromData = (data) => {
+    const notifications = [];
+    let notificationId = 1;
+
+    // Generate order notifications
+    if (data.orders && data.orders.length > 0) {
+      // Recent orders (last 5)
+      const recentOrders = data.orders.slice(0, 5);
+      recentOrders.forEach((order, index) => {
+        const timeAgo = getTimeAgo(order.date);
+        notifications.push({
+          id: notificationId++,
+          type: 'order',
+          title: 'New Order Received',
+          message: `Order from ${order.name || 'Customer'} - ₹${order.totalPrice}`,
+          time: timeAgo,
+          read: index > 2, // Mark first 3 as unread
+          orderId: order._id
+        });
+      });
+    }
+
+    // Generate low stock notifications
+    if (data.products && data.products.length > 0) {
+      const lowStockProducts = data.products.filter(product => 
+        product.productQuantity <= 5 && product.productQuantity > 0
+      );
+      
+      lowStockProducts.forEach((product, index) => {
+        notifications.push({
+          id: notificationId++,
+          type: 'product',
+          title: 'Low Stock Alert',
+          message: `${product.productName} - Only ${product.productQuantity} left`,
+          time: getRandomTimeAgo(),
+          read: index > 1, // Mark first 2 as unread
+          productId: product._id
+        });
+      });
+
+      // Out of stock notifications
+      const outOfStockProducts = data.products.filter(product => 
+        product.productQuantity === 0
+      );
+      
+      outOfStockProducts.forEach((product, index) => {
+        notifications.push({
+          id: notificationId++,
+          type: 'product',
+          title: 'Out of Stock',
+          message: `${product.productName} is out of stock`,
+          time: getRandomTimeAgo(),
+          read: false,
+          productId: product._id
+        });
+      });
+    }
+
+    // If no real notifications, show a system message
+    if (notifications.length === 0) {
+      notifications.push({
+        id: 1,
+        type: 'system',
+        title: 'System Ready',
+        message: 'Dashboard is ready. Add products and receive orders to see notifications.',
+        time: 'Just now',
+        read: false
+      });
+    }
+
+    // Sort by unread first, then by time
+    return notifications.sort((a, b) => {
+      if (a.read !== b.read) {
+        return a.read - b.read; // Unread first
+      }
+      return 0; // Keep original order for same read status
+    });
+  };
+
+  // Helper function to calculate time ago
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+  };
+
+  // Helper function for random time ago (for products without specific timestamps)
+  const getRandomTimeAgo = () => {
+    const times = ['5 minutes ago', '15 minutes ago', '30 minutes ago', '1 hour ago', '2 hours ago', '3 hours ago'];
+    return times[Math.floor(Math.random() * times.length)];
+  };
+
+  // Fetch notifications on component mount
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const handleImage = (event) => {
     const file = event.target.files[0];
@@ -81,6 +222,9 @@ const AdminDashboard = () => {
           setShowForm(false);
           setProducts([res.data.data, ...products]);
 
+          // Add notification for new product
+          addNotification('product', 'Product Added', `${productName} has been successfully added to inventory`);
+
           // Clear the form
           setProductName('');
           setProductPrice('');
@@ -110,7 +254,13 @@ const AdminDashboard = () => {
         .then((res) => {
           if (res.data.success) {
             toast.success(res.data.message);
+            const deletedProduct = products.find(product => product._id === id);
             setProducts(products.filter(product => product._id !== id));
+            
+            // Add notification for deleted product
+            if (deletedProduct) {
+              addNotification('product', 'Product Deleted', `${deletedProduct.productName} has been removed from inventory`);
+            }
           }
         })
         .catch((error) => {
@@ -129,6 +279,56 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     // Clear user session or token here if needed
     navigate('/login'); // Redirect to login page
+  };
+
+  const handleNotificationClick = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const markAsRead = (notificationId) => {
+    setNotifications(notifications.map(notification => 
+      notification.id === notificationId 
+        ? { ...notification, read: true }
+        : notification
+    ));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(notification => 
+      ({ ...notification, read: true })
+    ));
+  };
+
+  const deleteNotification = (notificationId) => {
+    setNotifications(notifications.filter(notification => 
+      notification.id !== notificationId
+    ));
+  };
+
+  const getUnreadCount = () => {
+    return notifications.filter(notification => !notification.read).length;
+  };
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'order': return '📦';
+      case 'product': return '⚠️';
+      case 'user': return '👤';
+      default: return '🔔';
+    }
+  };
+
+  // Function to add a new notification (can be called when events occur)
+  const addNotification = (type, title, message) => {
+    const newNotification = {
+      id: Date.now(),
+      type,
+      title,
+      message,
+      time: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
   };
 
 
@@ -153,9 +353,86 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="admin-navbar-right">
-            <div className="navbar-notifications">
+            <div 
+              className="navbar-notifications" 
+              onClick={handleNotificationClick}
+              ref={notificationRef}
+            >
               <span className="notification-icon">🔔</span>
-              <span className="notification-badge">3</span>
+              {getUnreadCount() > 0 && (
+                <span className="notification-badge">{getUnreadCount()}</span>
+              )}
+              
+              {showNotifications && (
+                <div className="notification-dropdown">
+                  <div className="notification-header">
+                    <h4>Notifications</h4>
+                    <button 
+                      className="mark-all-read"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAllAsRead();
+                      }}
+                    >
+                      Mark all as read
+                    </button>
+                    <button 
+                      className="refresh-notifications"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchNotifications();
+                      }}
+                    >
+                      🔄
+                    </button>
+                  </div>
+                  
+                  <div className="notification-list">
+                    {isLoadingNotifications ? (
+                      <div className="notification-loading">
+                        <div className="loading-spinner"></div>
+                        <p>Loading notifications...</p>
+                      </div>
+                    ) : notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div 
+                          key={notification.id} 
+                          className={`notification-item ${notification.read ? 'read' : 'unread'}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markAsRead(notification.id);
+                          }}
+                        >
+                          <div className="notification-content">
+                            <span className="notification-type-icon">
+                              {getNotificationIcon(notification.type)}
+                            </span>
+                            <div className="notification-text">
+                              <h5>{notification.title}</h5>
+                              <p>{notification.message}</p>
+                              <span className="notification-time">{notification.time}</span>
+                            </div>
+                          </div>
+                          <button 
+                            className="delete-notification"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(notification.id);
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-notifications">
+                        <span>📭</span>
+                        <p>No notifications</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="navbar-profile">
               <img 

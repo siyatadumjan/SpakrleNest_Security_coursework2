@@ -356,4 +356,22 @@ export const fetchActivityLogsApi = async () => {
   return response.data.logs;
 };
 
+// Get dashboard notifications from real data
+export const getDashboardNotificationsApi = async () => {
+  try {
+    const [orders, products] = await Promise.all([
+      getAllOrdersApi(),
+      getAllProductsApi()
+    ]);
+    
+    return {
+      orders: orders.data.orders || [],
+      products: products.data.products || []
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return { orders: [], products: [] };
+  }
+};
+
 export const initiateKhaltiPayment = (data) => KhaltiApi.post("api/v2/epayment/initiate/", data);
