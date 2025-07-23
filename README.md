@@ -4,7 +4,7 @@
 
 ## 🚀 Project Overview
 
-SparkleNest is a full-stack e-commerce platform built with modern web technologies, featuring a beautiful and intuitive user interface for cosmetics and beauty products.
+SparkleNest is a full-stack e-commerce platform built with modern web technologies, featuring a beautiful and intuitive user interface for cosmetics and beauty products. The platform includes a comprehensive admin dashboard with real-time notifications, inventory management, and advanced analytics.
 
 ### 🎨 Frontend Features
 - **Premium Boarding Page** - Elegant glassmorphism design with animations
@@ -12,24 +12,28 @@ SparkleNest is a full-stack e-commerce platform built with modern web technologi
 - **User Authentication** - Secure login and registration system
 - **Product Catalog** - Beautiful product display with search and filtering
 - **Shopping Cart** - Intuitive cart management and wishlist functionality
-- **Admin Dashboard** - Comprehensive admin panel for product and order management
+- **Smart Notifications** - Real-time notification system with order alerts and inventory warnings
+- **Admin Dashboard** - Comprehensive admin panel with live notifications and analytics
 - **Responsive Design** - Optimized for all devices with premium visual effects
 
 ### 🔧 Backend Features
 - **Secure Authentication** - JWT-based user authentication and authorization
 - **Product Management** - CRUD operations for products with image upload
-- **Order Processing** - Complete order management system
+- **Order Processing** - Complete order management system with real-time notifications
 - **User Management** - User profiles, preferences, and account management
-- **Payment Integration** - Secure payment processing
+- **Payment Integration** - Secure payment processing with Khalti integration
+- **Smart Notifications** - Automated notification system for orders and inventory
+- **Activity Logging** - Comprehensive system activity monitoring
 - **API Security** - SSL certificates and comprehensive error handling
 
 ## 🛠️ Technology Stack
 
 ### Frontend (`security_frontend/`)
-- **React.js** - Modern UI library
-- **CSS3** - Custom styling with glassmorphism effects
+- **React.js** - Modern UI library with hooks and context
+- **CSS3** - Custom styling with glassmorphism effects and animations
 - **React Icons** - Beautiful icon components
-- **Responsive Design** - Mobile-first approach
+- **Real-time Updates** - Dynamic notification system
+- **Responsive Design** - Mobile-first approach with modern UX
 
 ### Backend (`security_backend/`)
 - **Node.js** - Runtime environment
@@ -37,6 +41,7 @@ SparkleNest is a full-stack e-commerce platform built with modern web technologi
 - **MongoDB** - Database for data storage
 - **JWT** - Authentication tokens
 - **Multer** - File upload handling
+- **Khalti API** - Payment gateway integration
 - **SSL** - Secure communication
 
 ## 📁 Project Structure
@@ -47,15 +52,18 @@ SparkleNest/
 │   ├── src/
 │   │   ├── components/         # Reusable UI components
 │   │   ├── pages/             # Application pages
-│   │   ├── apis/              # API integration
-│   │   └── assets/            # Static assets
+│   │   │   └── admin/         # Admin dashboard with notifications
+│   │   ├── apis/              # API integration layer
+│   │   ├── context/           # React context providers
+│   │   └── assets/            # Static assets and images
 │   └── public/                # Public assets
 └── security_backend/           # Node.js backend application
-    ├── controllers/           # Business logic
-    ├── models/               # Database models
-    ├── routes/               # API routes
-    ├── middleware/           # Custom middleware
-    └── certificate/          # SSL certificates
+    ├── controllers/           # Business logic controllers
+    ├── models/               # MongoDB database models
+    ├── routes/               # Express API routes
+    ├── middleware/           # Custom middleware (auth, logging)
+    ├── service/              # External service integrations
+    └── certificate/          # SSL certificates for security
 ```
 
 ## 🚦 Getting Started
@@ -91,6 +99,7 @@ SparkleNest/
 4. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
+   - Admin Dashboard: http://localhost:3000/admin (with admin credentials)
 
 ## 📋 Available Scripts
 
@@ -120,7 +129,22 @@ Server will be available at [http://localhost:5000](http://localhost:5000).
 
 API endpoints will be accessible for frontend integration.
 
-## 🌟 Key Features
+## � Latest Features (2025 Update)
+
+### 🔔 Smart Notification System
+- **Real-time Alerts** - Instant notifications for new orders and system events
+- **Inventory Management** - Automated low stock and out-of-stock alerts
+- **Admin Dashboard Integration** - Live notification feed with glassmorphism design
+- **Interactive UI** - Mark as read, delete, and refresh functionality
+- **Backend Integration** - Dynamic notifications from real order and product data
+
+### 🎨 Enhanced UI/UX
+- **Modern Design** - Updated glassmorphism effects and animations
+- **Responsive Notifications** - Mobile-optimized notification dropdown
+- **Loading States** - Professional loading spinners and transitions
+- **Error Handling** - Graceful fallbacks and user feedback
+
+## �🌟 Key Features
 
 ### 🎭 Premium UI/UX
 - **Glassmorphism Effects** - Modern transparent design elements
@@ -142,11 +166,13 @@ API endpoints will be accessible for frontend integration.
 - **Input Validation** - Comprehensive data validation
 
 ### 👨‍💼 Admin Panel
-- **Dashboard Analytics** - Business insights
-- **Product Management** - Add, edit, delete products
-- **Order Management** - Process and track orders
-- **User Management** - Customer administration
-- **Activity Logs** - System monitoring
+- **Dashboard Analytics** - Business insights with real-time data
+- **Smart Notifications** - Live order alerts and inventory warnings
+- **Product Management** - Add, edit, delete products with image upload
+- **Order Management** - Process and track orders with status updates
+- **User Management** - Customer administration and profile management
+- **Activity Logs** - System monitoring and audit trails
+- **Inventory Alerts** - Low stock and out-of-stock notifications
 
 ## 🤝 Contributing
 
