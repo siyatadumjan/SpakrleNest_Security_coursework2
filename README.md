@@ -1,15 +1,60 @@
 # ✨ SparkleNest - Premium Cosmetics E-commerce Platform
 
-**Where beauty meets luxury.** Discover our curated collection of premium cosmetics, skincare essentials, and beauty treasures designed to enhance your natural radiance.
+**Where beauty meets luxury.** Discover our curated collection of premium c## 🎯 Latest FeaturAPI endpoints will be accessible for frontend integration.
+
+## 🔐 Authentication System
+
+### Login & Registration
+- **Secure Login** - JWT-based authentication with encrypted passwords
+- **User Registration** - Account creation with input validation and security checks
+- **Session Management** - Secure token-based session handling
+
+### Password Reset Flow
+1. **Email Verification** - User enters email address for password reset
+2. **OTP Generation** - System generates 6-digit OTP with 10-minute expiry
+3. **Email Delivery** - OTP sent to user's registered email address
+4. **OTP Verification** - User enters OTP to verify identity
+5. **Password History Check** - New password validated against previous passwords
+6. **Password Update** - Secure password reset with bcrypt encryption
+
+### Security Features
+- **Password History** - Prevents reuse of last 5 passwords
+- **OTP Expiry** - Time-limited verification codes for security
+- **Input Sanitization** - All inputs validated and sanitized
+- **Error Handling** - Secure error messages without information leakage
+
+## 🎯 Latest Features (2025 Update)(2025 Update)
+
+### 🔔 Smart Notification System
+- **Real-time Alerts** - Instant notifications for new orders and system events
+- **Inventory Management** - Automated low stock and out-of-stock alerts
+- **Admin Dashboard Integration** - Live notification feed with glassmorphism design
+- **Interactive UI** - Mark as read, delete, and refresh functionality
+- **Backend Integration** - Dynamic notifications from real order and product data
+
+### 🔐 Enhanced Security Features
+- **Advanced Password Reset** - Modern two-step verification system
+- **Email OTP Verification** - 6-digit OTP sent to user's email with 10-minute expiry
+- **Password History Protection** - Prevents reuse of previous passwords using bcrypt comparison
+- **Secure Reset Flow** - Email validation → OTP verification → Password reset with history check
+- **Modern UI Design** - Glassmorphism design matching login page aesthetics
+
+### 🎨 Enhanced UI/UX
+- **Modern Design** - Updated glassmorphism effects and animations
+- **Responsive Notifications** - Mobile-optimized notification dropdown
+- **Loading States** - Professional loading spinners and transitions
+- **Error Handling** - Graceful fallbacks and user feedback
+- **Consistent Styling** - Unified design language across all pagescare essentials, and beauty treasures designed to enhance your natural radiance.
 
 ## 🚀 Project Overview
 
-SparkleNest is a full-stack e-commerce platform built with modern web technologies, featuring a beautiful and intuitive user interface for cosmetics and beauty products. The platform includes a comprehensive admin dashboard with real-time notifications, inventory management, and advanced analytics.
+SparkleNest is a full-stack e-commerce platform built with modern web technologies, featuring a beautiful and intuitive user interface for cosmetics and beauty products. The platform includes a comprehensive admin dashboard with real-time notifications, inventory management, advanced analytics, and a robust security system with modern password reset functionality.
 
 ### 🎨 Frontend Features
 - **Premium Boarding Page** - Elegant glassmorphism design with animations
 - **Sleek Navigation** - Modern navbar with React icons and responsive design
 - **User Authentication** - Secure login and registration system
+- **Password Reset System** - Modern two-step verification with email OTP and password history validation
 - **Product Catalog** - Beautiful product display with search and filtering
 - **Shopping Cart** - Intuitive cart management and wishlist functionality
 - **Smart Notifications** - Real-time notification system with order alerts and inventory warnings
@@ -18,6 +63,7 @@ SparkleNest is a full-stack e-commerce platform built with modern web technologi
 
 ### 🔧 Backend Features
 - **Secure Authentication** - JWT-based user authentication and authorization
+- **Password Security** - Advanced password reset with OTP verification and reuse prevention
 - **Product Management** - CRUD operations for products with image upload
 - **Order Processing** - Complete order management system with real-time notifications
 - **User Management** - User profiles, preferences, and account management
@@ -100,6 +146,7 @@ SparkleNest/
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
    - Admin Dashboard: http://localhost:3000/admin (with admin credentials)
+   - Password Reset: http://localhost:3000/forgotpassword
 
 ## 📋 Available Scripts
 
@@ -160,10 +207,12 @@ API endpoints will be accessible for frontend integration.
 - **Order Tracking** - Complete order lifecycle
 
 ### 🔐 Security Features
-- **Encrypted Passwords** - Secure user data
-- **JWT Authentication** - Stateless authentication
-- **SSL Certificates** - Encrypted communication
-- **Input Validation** - Comprehensive data validation
+- **Encrypted Passwords** - Secure user data with bcrypt hashing
+- **JWT Authentication** - Stateless authentication with secure tokens
+- **Password Reset Security** - Two-factor verification with OTP and history validation
+- **SSL Certificates** - Encrypted communication between client and server
+- **Input Validation** - Comprehensive data validation and sanitization
+- **Password History Tracking** - Prevents password reuse for enhanced security
 
 ### 👨‍💼 Admin Panel
 - **Dashboard Analytics** - Business insights with real-time data
