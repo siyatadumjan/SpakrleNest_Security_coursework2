@@ -1,0 +1,136 @@
+/* Contact Container Styling */
+.contact-container {
+    background: linear-gradient(135deg, #000000 0%, #1F2937 50%, #374151 100%); /* Sleek black gradient */
+    color: #fff; /* White text for contrast */
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin: 0; /* Remove any margin */
+    position: relative;
+    bottom: 0; /* Ensure it stays at the bottom */
+    width: 100%; /* Ensure it spans the full width */
+    overflow: hidden;
+}
+
+/* Add premium overlay effect */
+.contact-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+    z-index: 1;
+}
+
+/* Ensure content appears above overlay */
+.contact-content {
+    position: relative;
+    z-index: 2;
+}
+/* Contact Content */
+.contact-content {
+    position: relative;
+    z-index: 2;
+    max-width: 650px; /* Slightly wider content area */
+    font-family: 'Inter', sans-serif; /* Modern sans-serif font matching navbar */
+    text-align: center; /* Center align all text content */
+}
+
+/* Title Style */
+.contact-content h3 {
+    font-size: 2rem;
+    font-weight: 700; /* Bolder for premium feel */
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle text shadow for depth */
+}
+
+/* Contact Information Flexbox */
+.contact-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px; /* Add space between email and phone */
+}
+
+/* Left Side Contact Info */
+.contact-left {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.contact-left:hover {
+    transform: translateY(-2px);
+}
+
+.contact-left p {
+    font-size: 1.1rem;
+    margin-left: 12px;
+    font-weight: 500;
+    color: #fff; /* White text for contrast */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Right Side Contact Info */
+.contact-right {
+    display: flex;
+    align-items: center;
+    margin-left: 0; /* Remove left margin since we're using gap now */
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.contact-right:hover {
+    transform: translateY(-2px);
+}
+
+.contact-right p {
+    font-size: 1.1rem;
+    margin-left: 12px;
+    font-weight: 500;
+    color: #fff; /* White text for consistency */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon Styling (optional, if used for contact info) */
+.contact-left i, .contact-right i {
+    font-size: 1.5rem; /* Larger icons for visual impact */
+    color: #fff; /* White icon color for consistency */
+    transition: all 0.3s ease; /* Smooth transition */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Icon Hover Effect */
+.contact-left i:hover, .contact-right i:hover {
+    transform: scale(1.1); /* Slight scale effect for hover interaction */
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .contact-container {
+        flex-direction: column;
+        align-items: center; /* Keep center alignment on mobile */
+    }
+
+    .contact-info {
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 20px; /* Reduce gap on mobile */
+    }
+
+    .contact-right {
+        margin-left: 0;
+        margin-top: 0; /* Remove top margin since we're using gap */
+    }
+}

@@ -1,0 +1,136 @@
+.add-to-wishlist-page {
+  font-family: 'Georgia', serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  padding-top: 50px;
+}
+
+.wishlist-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.wishlist-header {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.wishlist-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.wishlist-items-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-y: auto;
+  max-height: 65vh;
+}
+
+.wishlist-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  margin-bottom: 15px;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 25px;
+}
+
+.wishlist-item-details {
+  flex: 1;
+  color: #555;
+  font-size: 18px;
+  font-weight: 500;
+  margin-right: 60px;
+}
+
+.wishlist-item-actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-remove {
+  background-color: #c83b3b;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-remove:hover {
+  background-color: #a52e2e;
+}
+
+.total-price-container {
+  flex: 0 0 30%;
+  background-color: #f7e6f0;
+  border: 1px solid #dcdcdc;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.total-price-container h3 {
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.total-price-container p {
+  font-size: 20px;
+  color: #777;
+}
+
+.checkout-button {
+  background-color: #d4af7f;
+  border: 1px solid #b38e56;
+  color: #fff;
+  padding: 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.checkout-button:hover {
+  background-color: #c7a16d;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

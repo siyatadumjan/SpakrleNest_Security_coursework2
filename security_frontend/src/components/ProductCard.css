@@ -1,0 +1,83 @@
+/* ProductCard Specific Styling */
+.product-card {
+  position: relative;
+  margin-bottom: 30px;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: auto; /* Allow the height to adjust dynamically */
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product-card .card-img-top {
+  height: 250px;
+  object-fit: cover;
+  width: 100%;
+  border-bottom: 1px solid #D4AF37;
+}
+
+.product-card .card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+.favorite-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 1.8rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.favorite-icon.favorited {
+  color: #D4AF37;
+}
+.product-card .card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.product-card .card-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.product-card .button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.product-card .btn-add-to-cart,
+.product-card .btn-view-more {
+  flex: 1;
+  padding: 12px;
+  background-color: #D4AF37;
+  color: white;
+  border: 2px solid #D4AF37;
+  border-radius: 25px;
+  text-align: center;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s ease;
+}
+
+.product-card .btn-add-to-cart:hover,
+.product-card .btn-view-more:hover {
+  background-color: #ec407a;
+}
