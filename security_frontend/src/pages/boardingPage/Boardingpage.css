@@ -12,16 +12,6 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  animation: backgroundShift 20s ease-in-out infinite;
-}
-
-@keyframes backgroundShift {
-  0%, 100% { 
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 25%, #334155 50%, #475569 75%, #64748B 100%);
-  }
-  50% { 
-    background: linear-gradient(135deg, #1E293B 0%, #334155 25%, #475569 50%, #64748B 75%, #0F172A 100%);
-  }
 }
 
 /* Advanced floating background elements */
@@ -37,7 +27,6 @@
     radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 40%),
     radial-gradient(circle at 40% 10%, rgba(255, 255, 255, 0.05) 0%, transparent 30%),
     radial-gradient(circle at 60% 90%, rgba(255, 255, 255, 0.04) 0%, transparent 30%);
-  animation: backgroundFloat 15s ease-in-out infinite;
   z-index: 1;
 }
 
@@ -57,19 +46,7 @@
       transparent 240deg, 
       rgba(255, 255, 255, 0.02) 300deg, 
       transparent 360deg);
-  animation: rotateBackground 30s linear infinite;
   z-index: 1;
-}
-
-@keyframes rotateBackground {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes backgroundFloat {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  33% { transform: scale(1.05) rotate(1deg); }
-  66% { transform: scale(0.98) rotate(-1deg); }
 }
 
 /* Ultra-premium glassmorphism card */
@@ -99,39 +76,6 @@
   max-width: 600px;
   width: 90%;
   font-family: 'Inter', sans-serif;
-  animation: cardSlideUp 0.8s ease-out, cardFloat 6s ease-in-out infinite 2s;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-@keyframes cardFloat {
-  0%, 100% { 
-    transform: translateY(0) rotateX(0deg) rotateY(0deg);
-    box-shadow: 
-      0 32px 64px -12px rgba(0, 0, 0, 0.4),
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 0 0 1px rgba(255, 255, 255, 0.3),
-      inset 0 2px 4px rgba(255, 255, 255, 0.9);
-  }
-  50% { 
-    transform: translateY(-10px) rotateX(1deg) rotateY(1deg);
-    box-shadow: 
-      0 40px 80px -12px rgba(0, 0, 0, 0.5),
-      0 25px 35px -5px rgba(0, 0, 0, 0.15),
-      0 0 0 1px rgba(255, 255, 255, 0.4),
-      inset 0 3px 6px rgba(255, 255, 255, 0.95);
-  }
-}
-
-@keyframes cardSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Dynamic title with enhanced effects */
@@ -140,7 +84,6 @@
   font-weight: 900;
   margin-bottom: 24px;
   line-height: 1.1;
-  animation: titlePulse 4s ease-in-out infinite alternate, titleGlow 8s ease-in-out infinite;
   letter-spacing: -0.02em;
   display: flex;
   align-items: center;
@@ -150,59 +93,14 @@
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-.boarding-title::before {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background: linear-gradient(45deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.05) 25%, 
-    transparent 50%, 
-    rgba(255, 255, 255, 0.05) 75%, 
-    transparent 100%);
-  border-radius: 20px;
-  animation: titleShimmer 3s ease-in-out infinite;
-  z-index: -1;
-}
-
-@keyframes titleShimmer {
-  0%, 100% { opacity: 0; transform: translateX(-100%); }
-  50% { opacity: 1; transform: translateX(100%); }
-}
-
-@keyframes titleGlow {
-  0%, 100% { 
-    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 40px rgba(71, 85, 105, 0.2));
-  }
-  50% { 
-    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 60px rgba(71, 85, 105, 0.3));
-  }
-}
-
-/* Enhanced sparkle emoji with rotation */
+/* Enhanced sparkle emoji */
 .sparkle-emoji {
   font-size: 3.8rem;
   filter: none; /* Preserve natural emoji color */
-  animation: sparkleRotate 4s ease-in-out infinite, sparklePulse 2s ease-in-out infinite alternate;
   display: inline-block;
 }
 
-@keyframes sparkleRotate {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(5deg) scale(1.05); }
-  50% { transform: rotate(0deg) scale(1.1); }
-  75% { transform: rotate(-5deg) scale(1.05); }
-}
-
-@keyframes sparklePulse {
-  from { filter: brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); }
-  to { filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); }
-}
-
-/* Enhanced brand text with sleek gradient */
+/* Enhanced brand text */
 .brand-text {
   color: #000000;
   background: linear-gradient(135deg, 
@@ -215,51 +113,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradientShift 6s ease-in-out infinite, textFloat 3s ease-in-out infinite alternate;
   position: relative;
-}
-
-.brand-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    rgba(255, 255, 255, 0.05) 50%, 
-    rgba(255, 255, 255, 0.1) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: highlight 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes textFloat {
-  from { transform: translateY(0px); }
-  to { transform: translateY(-2px); }
-}
-
-@keyframes highlight {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
-@keyframes titlePulse {
-  from {
-    transform: scale(1);
-    filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.3));
-  }
-  to {
-    transform: scale(1.02);
-    filter: drop-shadow(0 0 30px rgba(71, 85, 105, 0.5));
-  }
 }
 
 /* Enhanced elegant subtitle */
@@ -269,48 +123,11 @@
   margin-bottom: 50px;
   line-height: 1.7;
   font-weight: 400;
-  opacity: 0;
+  opacity: 0.9;
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
-  animation: fadeInUp 1s ease-out 0.5s forwards, textGlow 4s ease-in-out infinite 1.5s;
   position: relative;
-  overflow: hidden;
-}
-
-.boarding-subtitle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(100, 116, 139, 0.2) 50%, 
-    transparent 100%);
-  animation: shimmerSubtitle 3s ease-in-out infinite 2s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-}
-
-@keyframes textGlow {
-  0%, 100% { text-shadow: 0 0 5px rgba(100, 116, 139, 0.3); }
-  50% { text-shadow: 0 0 15px rgba(100, 116, 139, 0.5), 0 0 25px rgba(100, 116, 139, 0.2); }
-}
-
-@keyframes shimmerSubtitle {
-  0% { left: -100%; }
-  100% { left: 100%; }
 }
 
 /* Premium button container */
@@ -346,69 +163,20 @@
     0 10px 40px rgba(0, 0, 0, 0.4),
     0 6px 20px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  animation: buttonFloat 4s ease-in-out infinite;
   backdrop-filter: blur(10px);
+  transition: transform 0.3s ease;
 }
 
-@keyframes buttonFloat {
-  0%, 100% { 
-    transform: translateY(0) scale(1);
-    background-position: 0% 50%;
-  }
-  50% { 
-    transform: translateY(-2px) scale(1.02);
-    background-position: 100% 50%;
-  }
+.boarding-button:hover {
+  transform: translateY(-2px);
 }
 
-/* Enhanced button glow effect */
-.boarding-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.15) 25%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
-    transparent 100%);
-  transition: left 0.8s ease;
-  animation: continuousGlow 4s ease-in-out infinite;
-}
-
-.boarding-button::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    transparent 25%, 
-    transparent 75%, 
-    rgba(255, 255, 255, 0.1) 100%);
-  border-radius: 20px;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-@keyframes continuousGlow {
-  0%, 100% { left: -100%; opacity: 0; }
-  50% { left: 100%; opacity: 1; }
-}
-
-.boarding-button:hover::before {
-  left: 100%;
-  animation-play-state: paused;
-}
-
-.boarding-button:hover::after {
-  opacity: 1;
+/* Button hover effects */
+.boarding-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.95) 0%, 
+    rgba(31, 41, 55, 0.95) 50%, 
+    rgba(55, 65, 81, 0.95) 100%);
 }
 
 /* Premium hover effects */

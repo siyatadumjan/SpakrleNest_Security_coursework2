@@ -152,9 +152,13 @@ export const forgotPasswordApi = (data) =>
   export const verifyOtpApi = (data) => Api.post("/api/user/verify_otp", data);
 
 
-  // Get Password History
+// Get Password History
 export const getPasswordHistoryApi = (data) =>
   Api.post("/api/user/get-password-history", data);
+
+// Make user admin (for development)
+export const makeUserAdminApi = (data) =>
+  Api.post("/api/user/make-admin", data);
 
   export const verifyRegisterOtpApi = (data) =>
     Api.post("/api/user/verify_register_otp", data);

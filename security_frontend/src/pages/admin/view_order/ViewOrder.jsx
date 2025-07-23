@@ -18,6 +18,34 @@ const ViewOrder = () => {
       navigate('/login');
       return;
     }
+
+    // Check if user is admin by decoding the token
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        
+        const userData = JSON.parse(jsonPayload);
+        console.log('Current user data:', userData);
+        
+        if (!userData.isAdmin) {
+          toast.error('Admin access required to view orders');
+          navigate('/');
+          return;
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        toast.error('Invalid session. Please login again.');
+        clearAuthToken();
+        navigate('/login');
+        return;
+      }
+    }
+
     fetchOrders();
   }, [navigate]);
 
@@ -26,22 +54,43 @@ const ViewOrder = () => {
     setError(null);
     
     try {
+      console.log('Fetching orders...');
       const res = await getAllOrdersApi();
+      console.log('API Response:', res);
+      
       if (res.data.success && res.data.orders) {
+        console.log('Orders found:', res.data.orders.length);
         setOrders(res.data.orders);
       } else {
-        console.error("Error Fetching Orders");
+        console.error("Error Fetching Orders - Invalid response:", res.data);
         setError("No orders found or invalid response");
       }
     } catch (error) {
       console.error("Error Fetching Orders:", error);
-      if (error.response?.status === 401) {
-        toast.error('Session expired. Please login again.');
-        clearAuthToken();
-        navigate('/login');
+      
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        console.error("Error status:", error.response.status);
+        
+        if (error.response.status === 401) {
+          toast.error('Session expired. Please login again.');
+          clearAuthToken();
+          navigate('/login');
+        } else if (error.response.status === 403) {
+          setError("You don't have permission to view orders. Admin access required.");
+          toast.error("Admin access required");
+        } else {
+          setError(`Error fetching orders: ${error.response.data.message || 'Unknown server error'}`);
+          toast.error(`Failed to fetch orders: ${error.response.data.message || 'Server error'}`);
+        }
+      } else if (error.request) {
+        console.error("Network error - no response received:", error.request);
+        setError("Network error. Please check if the server is running.");
+        toast.error("Network error. Please check your connection.");
       } else {
-        setError("Error fetching orders. Please try again later.");
-        toast.error("Failed to fetch orders");
+        console.error("Request setup error:", error.message);
+        setError(`Request error: ${error.message}`);
+        toast.error(`Request failed: ${error.message}`);
       }
     } finally {
       setIsLoading(false);
@@ -122,7 +171,7 @@ const ViewOrder = () => {
         <button className="back-button" onClick={() => navigate(-1)}>
           &larr;
         </button>
-        <div className="admin-navbar-logo">COSMOCARE</div>
+        <div className="admin-navbar-logo">✨ SparkleNest</div>
       </div>
       <div className="container">
         <h1 className="header">Order Management</h1>

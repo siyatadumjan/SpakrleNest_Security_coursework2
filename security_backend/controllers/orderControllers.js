@@ -227,18 +227,10 @@ const getAllOrders = async (req, res) => {
         },
       });
 
-    // Check if the orders array is empty
-    if (orders.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No orders found",
-      });
-    }
-
-    // If orders are found, return them
+    // Return orders (empty array if no orders found)
     res.status(200).json({
       success: true,
-      message: "Orders fetched successfully!",
+      message: orders.length === 0 ? "No orders found" : "Orders fetched successfully!",
       orders: orders,
     });
   } catch (error) {
