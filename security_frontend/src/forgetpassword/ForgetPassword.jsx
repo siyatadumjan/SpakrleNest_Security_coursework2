@@ -95,22 +95,37 @@ const ForgetPassword = () => {
   return (
     <div className="forget-password-container">
       <div className="forget-password-box">
+        {/* Image Side - Left Side */}
+        <div className="forget-password-image-side">
+          <div className="forget-password-image-content">
+            {/* Just the image background, no text overlay */}
+          </div>
+        </div>
+        
         <div className="forget-password-form">
-          <div className="text-center">
-            <Shield className="w-12 h-12 mx-auto mb-4 text-indigo-600" />
+          <div className="forget-password-header">
+            <Shield className="forget-password-icon" />
             <h1 className="forget-password-title">Password Reset</h1>
           </div>
           <h2 className="forget-password-subtitle">
             {!isSent ? "Request Reset Code" : "Enter Reset Details"}
           </h2>
+          
+          {/* Small descriptive text within the form */}
+          <div className="forget-password-description">
+            <p>
+              Reset your password securely with our two-step verification process. 
+              We'll send a verification code to your email to ensure your account stays protected.
+            </p>
+          </div>
 
           <div className="forget-password-fields">
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10}} />
               <input
                 id="email"
                 type="email"
-                className="forget-password-input pl-10"
+                className="forget-password-input"
                 placeholder="name@example.com"
                 disabled={isSent}
                 onChange={(e) => setEmail(e.target.value)}
@@ -129,22 +144,22 @@ const ForgetPassword = () => {
             ) : (
               <>
                 <div className="relative">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10}} />
                   <input
                     id="otp"
                     type="number"
-                    className="forget-password-input pl-10"
+                    className="forget-password-input"
                     placeholder="Enter 6-digit code"
                     onChange={(e) => setOtp(e.target.value)}
                   />
                 </div>
 
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" style={{position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10}} />
                   <input
                     id="new-password"
                     type="password"
-                    className="forget-password-input pl-10"
+                    className="forget-password-input"
                     placeholder="Enter new password"
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
