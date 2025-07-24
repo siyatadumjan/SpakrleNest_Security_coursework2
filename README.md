@@ -247,8 +247,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👨‍💻 Developer
 
-**Aayush Ghimire**
-- GitHub: [@aayushGhimire321](https://github.com/aayushGhimire321)
+**Siyata Dumjan**
+- GitHub: [@siyatadumjan](https://github.com/aayushGhimire321)
 - Project: [SparkleNest](https://github.com/aayushGhimire321/SparkleNest)
 
 ## 🙏 Acknowledgments
