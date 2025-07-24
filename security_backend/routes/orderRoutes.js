@@ -1,25 +1,42 @@
+
+// Import express router
 const router = require("express").Router();
 
+// Import order controller functions
 const orderController = require("../controllers/orderControllers");
 
+// Import authentication middleware
 const { authGuard, adminGuard } = require("../middleware/authGuard");
 
-// Place an order
+/**
+ * @route   POST /place_order
+ * @desc    Place a new order (requires authentication)
+ */
 router.post("/place_order", authGuard, orderController.placeOrder);
 
-// Route to get all orders
+/**
+ * @route   GET /get_all_orders
+ * @desc    Get all orders (admin or public view)
+ */
 router.get("/get_all_orders", orderController.getAllOrders);
 
-// Route to get orders by user
+/**
+ * @route   GET /get_orders_by_user
+ * @desc    Get all orders for the authenticated user
+ */
 router.get("/get_orders_by_user", authGuard, orderController.getOrdersByUser);
 
-// Route to update order status
+/**
+ * @route   POST /update_order_status/:orderId
+ * @desc    Update the status of an order (admin only)
+ */
 router.post(
   "/update_order_status/:orderId",
   adminGuard,
   orderController.updateOrderStatus
 );
 
+// Export the router for use in the main app
 module.exports = router;
 
 
