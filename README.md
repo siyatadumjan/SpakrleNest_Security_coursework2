@@ -248,8 +248,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 👨‍💻 Developer
 
 **Siyata Dumjan**
-- GitHub: [@siyatadumjan](https://github.com/aayushGhimire321)
-- Project: [SparkleNest](https://github.com/aayushGhimire321/SparkleNest)
+- GitHub: [@siyatadumjan](https://github.com/siyatadumjan)
+- Project: [SparkleNest](https://github.com/siyatadumjan/SpakrleNest_Security_coursework2)
 
 ## 🙏 Acknowledgments
 
