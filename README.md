@@ -1,3 +1,17 @@
+# 🧹 Project Hygiene & Best Practices
+
+### .gitignore Usage
+Your project includes a comprehensive `.gitignore` file to keep your repository clean and secure. This file ensures that sensitive environment variables, build outputs, logs, and IDE-specific files are not tracked by Git.
+
+**Common entries:**
+- `node_modules/` - Node.js dependencies
+- `.env` and related files - Environment variables
+- `/build`, `/dist` - Build output directories
+- `*.log`, `*.tmp` - Log and temporary files
+- `.vscode/`, `.idea/` - IDE/editor settings
+
+**Tip:** Regularly review and update your `.gitignore` to match your project's needs and avoid accidentally committing sensitive or unnecessary files.
+
 # ✨ SparkleNest - Premium Cosmetics E-commerce Platform
 
 **Where beauty meets luxury.** Discover our curated collection of premium c## 🎯 Latest FeaturAPI endpoints will be accessible for frontend integration.
