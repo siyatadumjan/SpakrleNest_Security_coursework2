@@ -3,8 +3,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import AdminDashboard from './AdminDashboard'; // Adjust the import path as needed
-import * as Api from '../../../apis/Api'; // Adjust the import path as needed
+import AdminDashboard from './dashboard/AdminDashboard'; // Adjust the import path as needed
+import * as Api from '../../apis/Api'; // Adjust the import path as needed
 
 // Mock the API functions
 jest.mock('../../../apis/Api', () => ({
