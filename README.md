@@ -1,17 +1,3 @@
-# 🧹 Project Hygiene & Best Practices
-
-### .gitignore Usage
-Your project includes a comprehensive `.gitignore` file to keep your repository clean and secure. This file ensures that sensitive environment variables, build outputs, logs, and IDE-specific files are not tracked by Git.
-
-**Common entries:**
-- `node_modules/` - Node.js dependencies
-- `.env` and related files - Environment variables
-- `/build`, `/dist` - Build output directories
-- `*.log`, `*.tmp` - Log and temporary files
-- `.vscode/`, `.idea/` - IDE/editor settings
-
-**Tip:** Regularly review and update your `.gitignore` to match your project's needs and avoid accidentally committing sensitive or unnecessary files.
-
 # ✨ SparkleNest - Premium Cosmetics E-commerce Platform
 
 **Where beauty meets luxury.** Discover our curated collection of premium c## 🎯 Latest FeaturAPI endpoints will be accessible for frontend integration.
@@ -38,6 +24,11 @@ Your project includes a comprehensive `.gitignore` file to keep your repository 
 - **Error Handling** - Secure error messages without information leakage
 
 ## 🎯 Latest Features (2025 Update)(2025 Update)
+
+### 🔔 Smart Notification System
+- **Real-time Alerts** - Instant notifications for new orders and system events
+- **Inventory Management** - Automated low stock and out-of-stock alerts
+- **Admin Dashboard Integration** - Live notification feed with glassmorphism design
 - **Interactive UI** - Mark as read, delete, and refresh functionality
 - **Backend Integration** - Dynamic notifications from real order and product data
 
@@ -45,6 +36,9 @@ Your project includes a comprehensive `.gitignore` file to keep your repository 
 - **Advanced Password Reset** - Modern two-step verification system
 - **Email OTP Verification** - 6-digit OTP sent to user's email with 10-minute expiry
 - **Password History Protection** - Prevents reuse of previous passwords using bcrypt comparison
+- **Secure Reset Flow** - Email validation → OTP verification → Password reset with history check
+- **Modern UI Design** - Glassmorphism design matching login page aesthetics
+
 ### 🎨 Enhanced UI/UX
 - **Modern Design** - Updated glassmorphism effects and animations
 - **Responsive Notifications** - Mobile-optimized notification dropdown
@@ -106,18 +100,49 @@ SparkleNest/
 │   │   ├── pages/             # Application pages
 │   │   │   └── admin/         # Admin dashboard with notifications
 │   │   ├── apis/              # API integration layer
+│   │   ├── context/           # React context providers
+│   │   └── assets/            # Static assets and images
+│   └── public/                # Public assets
+└── security_backend/           # Node.js backend application
+    ├── controllers/           # Business logic controllers
     ├── models/               # MongoDB database models
     ├── routes/               # Express API routes
+    ├── middleware/           # Custom middleware (auth, logging)
+    ├── service/              # External service integrations
+    └── certificate/          # SSL certificates for security
+```
 
 ## 🚦 Getting Started
 
 ### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB
+
 ### Installation
 
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/aayushGhimire321/SparkleNest.git
+   cd SparkleNest
+   ```
 
 2. **Setup Backend**
+   ```bash
+   cd security_backend
+   npm install
+   # Configure your .env file with database and JWT secrets
+   npm start
+   ```
 
 3. **Setup Frontend**
+   ```bash
+   cd security_frontend
+   npm install
+   npm start
+   ```
+
+4. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
    - Admin Dashboard: http://localhost:3000/admin (with admin credentials)
@@ -130,25 +155,18 @@ SparkleNest/
 ### `npm start`
 
 Runs the frontend app in development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
+
 ### Backend Development
 
-# 🧹 Project Hygiene & Best Practices
-
-### .gitignore Usage
-Your project includes a comprehensive `.gitignore` file to keep your repository clean and secure. This file ensures that sensitive environment variables, build outputs, logs, and IDE-specific files are not tracked by Git.
-
-**Common entries:**
-- `node_modules/` - Node.js dependencies
-- `.env` and related files - Environment variables
-- `/build`, `/dist` - Build output directories
-- `*.log`, `*.tmp` - Log and temporary files
-- `.vscode/`, `.idea/` - IDE/editor settings
-
-**Tip:** Regularly review and update your `.gitignore` to match your project's needs and avoid accidentally committing sensitive or unnecessary files.
 Navigate to `security_backend/` directory:
 
 ### `npm start`
@@ -204,6 +222,22 @@ API endpoints will be accessible for frontend integration.
 - **User Management** - Customer administration and profile management
 - **Activity Logs** - System monitoring and audit trails
 - **Inventory Alerts** - Low stock and out-of-stock notifications
+
+
+
+# 🧹 Project Hygiene & Best Practices
+
+### .gitignore Usage
+Your project includes a comprehensive `.gitignore` file to keep your repository clean and secure. This file ensures that sensitive environment variables, build outputs, logs, and IDE-specific files are not tracked by Git.
+
+**Common entries:**
+- `node_modules/` - Node.js dependencies
+- `.env` and related files - Environment variables
+- `/build`, `/dist` - Build output directories
+- `*.log`, `*.tmp` - Log and temporary files
+- `.vscode/`, `.idea/` - IDE/editor settings
+
+**Tip:** Regularly review and update your `.gitignore` to match your project's needs and avoid accidentally committing sensitive or unnecessary files.
 
 ## 🤝 Contributing
 
