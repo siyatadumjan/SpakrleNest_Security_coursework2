@@ -17,7 +17,17 @@ const sendOtp = async (email, otp) => {
     subject: "SparkleNest Password Reset Verification Code", // Subject line
     text: `Hello,\n\nYou requested a password reset for your SparkleNest account.\n\nYour One-Time Password (OTP) is: ${otp}\n\nPlease enter this code in the app to continue. This code will expire in 10 minutes.\n\nIf you did not request this, please ignore this email.\n\nThank you,\nSparkleNest Team`, // Plain text body
     html: `<div style='font-family: Arial, sans-serif; font-size: 16px; color: #222;'>
- 
+      <p>Hello,</p>
+      <p>You requested a password reset for your <b>SparkleNest</b> account.</p>
+      <p>Your One-Time Password (OTP) is:</p>
+      <h2 style='color: #0EA5E9;'>${otp}</h2>
+      <p>Please enter this code in the app to continue. This code will expire in <b>10 minutes</b>.</p>
+      <p>If you did not request this, please ignore this email.</p>
+      <br>
+      <p>Thank you,<br>SparkleNest Team</p>
+    </div>`, // HTML body
+  };
+
   try {
     // Send email
     const info = await transporter.sendMail(mailOptions);
@@ -26,7 +36,6 @@ const sendOtp = async (email, otp) => {
   } catch (error) {
     console.error("Error sending email:", error.message);
     return false; // Return false if there's an error
-  };
   }
 };
  
