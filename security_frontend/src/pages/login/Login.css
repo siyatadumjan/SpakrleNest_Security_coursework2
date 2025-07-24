@@ -67,6 +67,7 @@
 .forgot-password-link:hover {
   color: #60A5FA;
 }
+.login-form-container {
   background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
   font-family: 'Inter', sans-serif;
 }
