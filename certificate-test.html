@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Trust Test</title>
+</head>
+<body>
+    <h1>Certificate Trust Test</h1>
+    <button onclick="testConnection()">Test Backend Connection</button>
+    <button onclick="testRegistration()">Test Registration</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            try {
+                const response = await fetch('https://localhost:5000/test');
+                const data = await response.text();
+                document.getElementById('result').innerHTML = `<p style="color: green;">✅ Connection successful: ${data}</p>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red;">❌ Connection failed: ${error.message}</p>`;
+            }
+        }
+
+        async function testRegistration() {
+            try {
+                const testData = {
+                    userName: "testuser",
+                    email: "test@example.com",
+                    password: "Test123!@#",
+                    phone: "1234567890"
+                };
+
+                const response = await fetch('https://localhost:5000/api/user/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                document.getElementById('result').innerHTML = `<p style="color: ${result.success ? 'green' : 'red'};">${result.success ? '✅' : '❌'} Registration: ${result.message}</p>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red;">❌ Registration failed: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
