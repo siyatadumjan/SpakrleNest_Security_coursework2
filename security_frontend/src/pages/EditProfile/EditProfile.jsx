@@ -17,20 +17,72 @@ const ProfileEdit = () => {
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
+      // Check if user is logged in first
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error("Please login first to edit your profile.");
+        console.log('No token found, user needs to login');
+        return;
+      }
+
       try {
+        console.log('Fetching user data...');
         const result = await fetchUserDataApi();
+        console.log('User data result:', result);
+        
         if (result.success) {
           const { userName, email, phone, profilePicture } = result.user;
           setFormData({ userName, email, phone, profilePicture });
+          console.log('User profile data:', { userName, email, phone, profilePicture });
+          
           if (profilePicture) {
-            setPreviewImage(`https://localhost:5000/profile_pictures/${profilePicture}`);
+            console.log('Profile picture found:', profilePicture);
+            // Try HTTP first (port 5001), then HTTPS as fallback (port 5000)
+            const imageUrl = `http://localhost:5001/profile_pictures/${profilePicture}`;
+            console.log('Setting preview image URL:', imageUrl);
+            
+            // Test if the image URL is accessible
+            const testImage = new Image();
+            testImage.onload = () => {
+              console.log('Image test successful, setting preview');
+              setPreviewImage(imageUrl);
+            };
+            testImage.onerror = () => {
+              console.log('HTTP image test failed, trying HTTPS');
+              const httpsUrl = `https://localhost:5000/profile_pictures/${profilePicture}`;
+              const testImageHttps = new Image();
+              testImageHttps.onload = () => {
+                console.log('HTTPS image test successful');
+                setPreviewImage(httpsUrl);
+              };
+              testImageHttps.onerror = () => {
+                console.log('Both HTTP and HTTPS image tests failed');
+                setPreviewImage(null);
+              };
+              testImageHttps.src = httpsUrl;
+            };
+            testImage.src = imageUrl;
+          } else {
+            console.log('No profile picture found for user');
+            setPreviewImage(null);
           }
+          console.log('User data loaded successfully');
         } else {
           throw new Error(result.message || "Failed to fetch user data");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        toast.error("Failed to load user data. Please try again later.");
+        
+        // Check if it's an authentication error
+        if (error.message.includes("token") || error.message.includes("No token found")) {
+          toast.error("Please login first to edit your profile.");
+          // Optionally redirect to login page
+          // window.location.href = '/login';
+        } else if (error.message.includes("Failed to fetch")) {
+          toast.error("Cannot connect to server. Please check if the backend is running.");
+        } else {
+          toast.error("Failed to load user data. Please try again later.");
+        }
       }
     };
 
@@ -131,7 +183,26 @@ const ProfileEdit = () => {
                     src={previewImage}
                     alt="Profile Preview"
                     className="profile-picture-preview"
+                    onError={(e) => {
+                      console.log('Failed to load image from HTTP, trying HTTPS...');
+                      if (formData.profilePicture && !e.target.src.includes('https://')) {
+                        e.target.src = `https://localhost:5000/profile_pictures/${formData.profilePicture}`;
+                      } else {
+                        console.log('Image failed to load from both HTTP and HTTPS');
+                        setPreviewImage(null);
+                        toast.error('Failed to load profile picture');
+                      }
+                    }}
+                    onLoad={() => console.log('Profile picture loaded successfully')}
                   />
+                </div>
+              )}
+              {!previewImage && formData.profilePicture && (
+                <div className="mb-4 flex justify-center">
+                  <div className="profile-picture-placeholder">
+                    <p>Profile Picture</p>
+                    <small>Image failed to load</small>
+                  </div>
                 </div>
               )}
               <div className="mb-4">

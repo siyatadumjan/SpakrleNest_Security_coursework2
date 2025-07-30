@@ -11,8 +11,8 @@ const BoardingPage = () => {
           <span className="brand-text">SparkleNest</span>
         </h1>
         <p className="boarding-subtitle">
-          Where beauty meets luxury. Discover our curated collection of premium cosmetics, 
-          skincare essentials, and beauty treasures designed to enhance your natural radiance.
+          Where elegance meets craftsmanship. Discover our curated collection of premium jewelry, 
+          exquisite accessories, and timeless treasures designed to enhance your natural beauty.
         </p>
         <div className="boarding-buttons">
           <Link to="/login" className="boarding-button">Sign In</Link>

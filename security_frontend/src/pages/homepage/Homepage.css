@@ -144,6 +144,9 @@ body::before {
 .carousel-container {
   margin-bottom: 40px;
   padding: 0 40px;
+  min-height: 400px; /* Ensure minimum height for carousel */
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Content Layout */

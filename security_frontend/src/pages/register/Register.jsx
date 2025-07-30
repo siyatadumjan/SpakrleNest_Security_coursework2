@@ -23,19 +23,20 @@ function Register() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [otpError, setOtpError] = useState(''); // Error for OTP input
 
-  const [passwordStrength, setPasswordStrength] = useState('');  // Strength score
   const [passwordStrengthLabel, setPasswordStrengthLabel] = useState(''); // Strength label
   const [isTypingPassword, setIsTypingPassword] = useState(false);  // Check if the user is typing
 
   const navigate = useNavigate();
 
   const sanitizeInput = (input) => {
+    if (typeof input !== 'string') return input;
+    // Basic sanitization - remove dangerous characters but preserve valid JSON
+    // Don't escape quotes as they're needed for JSON
     return input
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#x27;");
+      .trim();
   };
 
   const validateForm = () => {
@@ -44,6 +45,9 @@ function Register() {
     // Validate userName
     if (!userName.trim()) {
       setUsernameError('Username is required');
+      isValid = false;
+    } else if (userName.trim().length < 3) {
+      setUsernameError('Username must be at least 3 characters long');
       isValid = false;
     } else {
       setUsernameError('');
@@ -54,24 +58,34 @@ function Register() {
       setEmailError('Email is required');
       isValid = false;
     } else {
-      setEmailError('');
+      // Email validation regex
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        setEmailError('Please enter a valid email address');
+        isValid = false;
+      } else {
+        setEmailError('');
+      }
     }
   
     // Validate phone
     if (!phone.trim()) {
       setPhoneError('Phone number is required');
       isValid = false;
+    } else if (phone.trim().length < 10) {
+      setPhoneError('Phone number must be at least 10 digits');
+      isValid = false;
     } else {
       setPhoneError('');
     }
   
-    // Validate password
+    // Validate password - Match backend regex exactly
     if (!password.trim()) {
       setPasswordError('Password is required');
       isValid = false;
     } else {
-      // Regex for password validation: at least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-      const passwordValidationRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      // Backend regex: at least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+      const passwordValidationRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       if (!passwordValidationRegex.test(password)) {
         toast.error('Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one number, and one special character');
         setPasswordError('Password format is incorrect');
@@ -98,7 +112,7 @@ function Register() {
 
   const checkPasswordStrength = (password) => {
     const result = zxcvbn(password);
-    setPasswordStrength(result.score);  // 0 to 4 score
+    // Set strength label based on score (0-4)
     if (result.score === 0) {
       setPasswordStrengthLabel('Low');
     } else if (result.score === 1 || result.score === 2) {
@@ -124,13 +138,28 @@ function Register() {
 
     registerUserApi(data)
       .then((response) => {
+        console.log('Registration response:', response.data);
         toast.success('Registration successful! Please verify your email.');
         setIsOtpSent(true); // OTP sent after successful registration
         setOtp(''); // Reset OTP field when switching to OTP form
       })
       .catch((error) => {
+        console.error('Registration error:', error);
+        
         if (error.response && error.response.data) {
-          toast.error(error.response.data.message);
+          // Check if it's a validation error
+          if (error.response.data.errors && Array.isArray(error.response.data.errors)) {
+            // Display validation errors
+            error.response.data.errors.forEach(err => {
+              toast.error(err.msg || err.message);
+            });
+          } else {
+            toast.error(error.response.data.message || 'Registration failed');
+          }
+        } else if (error.code === 'ERR_NETWORK') {
+          toast.error('Network error. Please check if the server is running.');
+        } else if (error.code === 'ECONNREFUSED') {
+          toast.error('Cannot connect to server. Please try again later.');
         } else {
           toast.error('Registration failed. Please try again.');
         }

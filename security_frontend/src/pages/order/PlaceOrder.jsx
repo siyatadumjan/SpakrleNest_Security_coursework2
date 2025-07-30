@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   getCartApi,
   initializeKhaltiPaymentApi,
+  initializeSimpleKhaltiPaymentApi,
   placeOrderApi,
   updateCartStatusApi,
 } from "../../apis/Api";
@@ -80,24 +81,47 @@ const PlaceOrder = () => {
 
   const handlePayment = async (orderId, totalPrice) => {
     try {
-      const paymentResponse = await initializeKhaltiPaymentApi({
-        orderId,
-        totalPrice,
-        website_url: window.location.origin,
-      });
+      console.log('Initializing payment with:', { orderId, totalPrice, website_url: window.location.origin });
+      
+      // Try the main payment method first
+      let paymentResponse;
+      try {
+        paymentResponse = await initializeKhaltiPaymentApi({
+          orderId,
+          totalPrice,
+          website_url: window.location.origin,
+        });
+      } catch (mainError) {
+        console.log('Main payment failed, trying simplified method:', mainError.message);
+        
+        // Fallback to simplified payment
+        paymentResponse = await initializeSimpleKhaltiPaymentApi({
+          totalPrice,
+          website_url: window.location.origin,
+        });
+      }
+
+      console.log('Payment response:', paymentResponse);
 
       if (paymentResponse.data.success) {
         const paymentUrl = paymentResponse.data.payment.payment_url;
+        console.log('Redirecting to payment URL:', paymentUrl);
         window.location.href = paymentUrl;
       } else {
-        toast.error("Failed to initialize payment. Please try again.");
+        console.error('Payment initialization failed:', paymentResponse.data);
+        toast.error(paymentResponse.data.message || "Failed to initialize payment. Please try again.");
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error(
-        "Error processing payment: " +
-        (error.response?.data?.message || error.message || "Unknown error")
-      );
+      console.error("Error response:", error.response?.data);
+      
+      if (error.response?.status === 401) {
+        toast.error("Please log in to continue with payment.");
+      } else if (error.response?.data?.message) {
+        toast.error("Payment Error: " + error.response.data.message);
+      } else {
+        toast.error("Error processing payment: " + (error.message || "Unknown error"));
+      }
     }
   };
 

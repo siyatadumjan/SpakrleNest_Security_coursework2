@@ -17,42 +17,52 @@ const MenuBar = ({ onCategoryChange, }) => {
           <li>
             <input
               type="radio"
-              id="Skincare"
+              id="Anklets"
               name="productCategory"
-              value="Skincare"
+              value="Anklets"
               onChange={handleCategoryChange}
             />
-            <label htmlFor="Skincare">Skincare</label>
+            <label htmlFor="Anklets">Anklets</label>
           </li>
           <li>
             <input
               type="radio"
-              id="Makeup"
+              id="Bracelets"
               name="productCategory"
-              value="Makeup"
+              value="Bracelets"
               onChange={handleCategoryChange}
             />
-            <label htmlFor="Makeup">Makeup</label>
+            <label htmlFor="Bracelets">Bracelets</label>
           </li>
           <li>
             <input
               type="radio"
-              id="Haircare"
+              id="Earrings"
               name="productCategory"
-              value="Haircare"
+              value="Earrings"
               onChange={handleCategoryChange}
             />
-            <label htmlFor="Haircare">Haircare</label>
+            <label htmlFor="Earrings">Earrings</label>
           </li>
           <li>
             <input
               type="radio"
-              id="Fragrance"
+              id="Necklaces"
               name="productCategory"
-              value="Fragrance"
+              value="Necklaces"
               onChange={handleCategoryChange}
             />
-            <label htmlFor="Fragrance">Fragrance</label>
+            <label htmlFor="Necklaces">Necklaces</label>
+          </li>
+          <li>
+            <input
+              type="radio"
+              id="Rings"
+              name="productCategory"
+              value="Rings"
+              onChange={handleCategoryChange}
+            />
+            <label htmlFor="Rings">Rings</label>
           </li>
         </ul>
       </div>

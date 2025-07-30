@@ -13,7 +13,18 @@ import './ProductCard.css';
 
 const ProductCard = ({ productInformation, color }) => {
   const navigate = useNavigate();
-  const userId = localStorage.getItem('id');
+  
+  // Get user ID from stored user data
+  const getUserId = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user?._id || null;
+    } catch {
+      return null;
+    }
+  };
+  
+  const userId = getUserId();
   const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
@@ -47,6 +58,10 @@ const ProductCard = ({ productInformation, color }) => {
       return;
     }
 
+    // Debug: Log the current authentication state
+    console.log('Debug - User ID:', userId);
+    console.log('Debug - Token:', localStorage.getItem('token'));
+
     try {
       const cartResponse = await getCartApi();
       console.log('Cart API Response:', cartResponse); // Debug response
@@ -60,18 +75,26 @@ const ProductCard = ({ productInformation, color }) => {
         return;
       }
 
+      console.log('Adding to cart with data:', { userId, productId: productInformation._id, quantity: 1 });
       const addResponse = await addToCartApi({
+        userId,
         productId: productInformation._id,
         quantity: 1,
-      }); // Assuming quantity is 1
+      });
+      
       if (addResponse.data.success) {
         toast.success('Product added to cart');
       } else {
         toast.error(addResponse.data.message || 'Failed to add product to cart');
       }
     } catch (error) {
-      toast.error('An error occurred');
       console.error('Error adding product to cart:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        toast.error(error.response.data?.message || 'Failed to add product to cart');
+      } else {
+        toast.error('Network error. Please try again.');
+      }
     }
   };
 

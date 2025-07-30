@@ -225,7 +225,7 @@ const ViewOrder = () => {
                               className="product-item"
                             >
                               <img
-                                src={`http://localhost:5000/products/${product.productId.productImage}`}
+                                src={`https://localhost:5000/products/${product.productId.productImage}`}
                                 alt={product.productId.productName}
                                 className="product-image"
                               />

@@ -56,7 +56,7 @@ const Navbar = ({ onSearchResults }) => {
           <div className="navbar-search">
             <input 
               type="text" 
-              placeholder="Search for cosmetics, skincare..." 
+              placeholder="Search for jewelry, accessories..." 
               className="search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

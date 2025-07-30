@@ -103,7 +103,17 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = async () => {
-    const userId = localStorage.getItem('id'); // Retrieve user ID from local storage
+    // Get user ID from stored user data
+    const getUserId = () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user?._id || null;
+      } catch {
+        return null;
+      }
+    };
+    
+    const userId = getUserId();
     if (!userId) {
       toast.error('You need to be logged in to add items to the cart');
       return;
@@ -188,7 +198,7 @@ const ProductDetails = () => {
             <p className="product-price">NPR {product.productPrice}</p>
             <p>{product.productDescription}</p>
             <p><strong>Category:</strong> {product.productCategory}</p>
-            <p><strong>Skin Type:</strong> {product.productSkinType}</p>
+            <p><strong>Material:</strong> {product.productMaterial || 'Not specified'}</p>
             <p><strong>Quantities Available:</strong> {product.productQuantity}</p>
             <div className="quantity-selector">
               <button onClick={() => handleQuantityChange(-1)}>-</button>

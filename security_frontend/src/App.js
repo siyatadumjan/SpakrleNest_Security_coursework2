@@ -29,13 +29,11 @@ function App() {
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
        
-       
         <Route element={<AdminRoutes />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path='/admin/update/:id' element={<UpdateProduct />} />
           <Route path='/admin/view-order' element={<ViewOrder />} />
           <Route path='/admin/activity-log' element={<ActivityLog />} />
-
         </Route>
 
         <Route element={<UserRoutes />}>
@@ -45,7 +43,6 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/placeorder" element={<PlaceOrder />} />
           <Route path="/edit-profile" element={<EditProfile />} />
-
         </Route>
         <Route path='/forgotpassword' element={<ForgetPassword/>} />
       </Routes>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUserApi, loginOTPApi } from '../../apis/Api';
@@ -8,12 +8,14 @@ import './Login.css';
 
 // Utility function to sanitize input
 const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  // Basic sanitization - remove dangerous characters but preserve valid JSON
+  // Don't escape quotes as they're needed for JSON
   return input
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
+    .trim();
 };
 
 const Login = () => {
@@ -68,7 +70,7 @@ const Login = () => {
         } else {
           if (res.data.lockoutTime) {
             // Handle account lockout
-            const remainingTime = Math.floor((new Date(res.data.lockoutTime) - new Date()) / 1000); // time in seconds
+            const remainingTime = Math.floor((new Date(res.data.lockoutTime) - new Date()) / 1000);
             if (remainingTime > 0) {
               setLockoutMessage(`Account locked. Try again in ${remainingTime} seconds.`);
               setLockoutTimeRemaining(remainingTime);
@@ -114,7 +116,7 @@ const Login = () => {
   
 
   return (
-    <div className={`login-container ${isOtpSent ? 'blur-background' : ''}`}>
+    <div className="login-container">
       <Toaster />
       <div className="login-box">
         <div className="login-form">
@@ -149,7 +151,7 @@ const Login = () => {
                 Forgot Password?
               </Link>
             </div>
-            <div className="flex justify-center bg-gray-800/50 p-4 rounded-xl backdrop-blur-sm">
+            <div className="recaptcha-container">
               <ReCAPTCHA
                 ref={recaptchaRef}
                 sitekey="6LfXFb4qAAAAALY5BEaLWfTEVPgCX9kVsSpP3z4c"

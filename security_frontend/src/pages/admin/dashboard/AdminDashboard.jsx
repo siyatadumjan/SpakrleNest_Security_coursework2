@@ -9,12 +9,19 @@ import './AdminDashboard.css'; // Import the CSS file
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
+  const [originalProducts, setOriginalProducts] = useState([]); // Store original products for search
+  const [orders, setOrders] = useState([]); // Add orders state
+  const [searchQuery, setSearchQuery] = useState(''); // Add search state
+  const [searchResults, setSearchResults] = useState([]); // Search results
+  const [isSearching, setIsSearching] = useState(false); // Search loading state
+  const [showSearchResults, setShowSearchResults] = useState(false); // Show search dropdown
   const [showForm, setShowForm] = useState(false);
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productCategory, setProductCategory] = useState('');
 
   const [productDescription, setProductDescription] = useState('');
+  const [productMaterial, setProductMaterial] = useState('');
   const [productImage, setProductImage] = useState(null);
   const [productQuantity, setProductQuantity] = useState('');
   const [previewImage, setPreviewImage] = useState('');
@@ -23,6 +30,7 @@ const AdminDashboard = () => {
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
   const navigate = useNavigate();
   const notificationRef = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     // Check if user is authenticated before fetching products
@@ -33,9 +41,11 @@ const AdminDashboard = () => {
       return;
     }
     
+    // Fetch products
     getAllProductsApi()
       .then((res) => {
         setProducts(res.data.products);
+        setOriginalProducts(res.data.products); // Store original products
       })
       .catch((error) => {
         console.log(error);
@@ -45,6 +55,15 @@ const AdminDashboard = () => {
           navigate('/login');
         }
       });
+
+    // Fetch orders
+    getAllOrdersApi()
+      .then((res) => {
+        setOrders(res.data.orders || []);
+      })
+      .catch((error) => {
+        console.log('Error fetching orders:', error);
+      });
   }, [navigate]);
 
   // Close notification dropdown when clicking outside
@@ -52,6 +71,9 @@ const AdminDashboard = () => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
       }
     };
 
@@ -210,7 +232,7 @@ const AdminDashboard = () => {
     formData.append('productName', productName);
     formData.append('productPrice', productPrice);
     formData.append('productCategory', productCategory);
-
+    formData.append('productMaterial', productMaterial);
     formData.append('productDescription', productDescription);
     formData.append('productQuantity', productQuantity);
     formData.append('productImage', productImage);
@@ -229,7 +251,7 @@ const AdminDashboard = () => {
           setProductName('');
           setProductPrice('');
           setProductCategory('');
-   
+          setProductMaterial('');
           setProductDescription('');
           setProductQuantity('');
           setProductImage(null);
@@ -283,6 +305,79 @@ const AdminDashboard = () => {
 
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
+  };
+
+  // Search functionality
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim() === '') {
+      setShowSearchResults(false);
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    
+    // Search through products
+    const productResults = originalProducts.filter(product => 
+      product.productName?.toLowerCase().includes(query.toLowerCase()) ||
+      product.productCategory?.toLowerCase().includes(query.toLowerCase()) ||
+      product.productDescription?.toLowerCase().includes(query.toLowerCase()) ||
+      product.productMaterial?.toLowerCase().includes(query.toLowerCase())
+    ).map(product => ({
+      ...product,
+      type: 'product',
+      title: product.productName,
+      subtitle: `Category: ${product.productCategory || 'N/A'} | Price: NPR ${product.productPrice || 'N/A'}`,
+      image: product.productImageUrl
+    }));
+
+    // Search through orders
+    const orderResults = orders.filter(order => 
+      order.user?.firstName?.toLowerCase().includes(query.toLowerCase()) ||
+      order.user?.lastName?.toLowerCase().includes(query.toLowerCase()) ||
+      order.user?.email?.toLowerCase().includes(query.toLowerCase()) ||
+      order._id?.toLowerCase().includes(query.toLowerCase()) ||
+      order.paymentMethod?.toLowerCase().includes(query.toLowerCase())
+    ).map(order => ({
+      ...order,
+      type: 'order',
+      title: `Order #${order._id?.slice(-8) || 'N/A'}`,
+      subtitle: `Customer: ${order.user?.firstName || 'N/A'} ${order.user?.lastName || ''} | Total: NPR ${order.totalAmount || 'N/A'}`,
+      image: null
+    }));
+
+    const allResults = [...productResults, ...orderResults];
+    setSearchResults(allResults);
+    setShowSearchResults(true);
+    setIsSearching(false);
+  };
+
+  const handleSearchResultClick = (result) => {
+    if (result.type === 'product') {
+      // Scroll to product in the products table
+      const productElement = document.getElementById(`product-${result._id}`);
+      if (productElement) {
+        productElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        productElement.style.backgroundColor = '#FEF3C7';
+        setTimeout(() => {
+          productElement.style.backgroundColor = '';
+        }, 2000);
+      }
+    } else if (result.type === 'order') {
+      // Navigate to orders page or show order details
+      navigate('/admin/orders');
+    }
+    setShowSearchResults(false);
+    setSearchQuery('');
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowSearchResults(false);
   };
 
   const markAsRead = (notificationId) => {
@@ -343,13 +438,73 @@ const AdminDashboard = () => {
             <span className="logo-badge">Admin</span>
           </div>
           <div className="navbar-center">
-            <div className="navbar-search">
+            <div className="navbar-search" ref={searchRef}>
               <input 
                 type="text" 
                 placeholder="Search products, orders..." 
                 className="search-input"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => searchQuery && setShowSearchResults(true)}
               />
+              {searchQuery && (
+                <button className="search-clear" onClick={clearSearch}>
+                  ✕
+                </button>
+              )}
               <span className="search-icon">🔍</span>
+              
+              {/* Search Results Dropdown */}
+              {showSearchResults && (
+                <div className="search-results-dropdown">
+                  <div className="search-results-header">
+                    <span>Search Results ({searchResults.length})</span>
+                    {isSearching && <div className="search-loading">Searching...</div>}
+                  </div>
+                  
+                  {searchResults.length > 0 ? (
+                    <div className="search-results-list">
+                      {searchResults.slice(0, 8).map((result, index) => (
+                        <div 
+                          key={`${result.type}-${result._id || index}`}
+                          className="search-result-item"
+                          onClick={() => handleSearchResultClick(result)}
+                        >
+                          <div className="search-result-content">
+                            {result.image && (
+                              <img 
+                                src={`http://localhost:5000/${result.image}`} 
+                                alt={result.title}
+                                className="search-result-image"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                            )}
+                            <div className="search-result-info">
+                              <div className="search-result-title">{result.title}</div>
+                              <div className="search-result-subtitle">{result.subtitle}</div>
+                            </div>
+                            <div className="search-result-type">
+                              {result.type === 'product' ? '📦' : '🛒'}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {searchResults.length > 8 && (
+                        <div className="search-results-more">
+                          +{searchResults.length - 8} more results
+                        </div>
+                      )}
+                    </div>
+                  ) : !isSearching ? (
+                    <div className="search-no-results">
+                      <span>📭</span>
+                      <p>No results found for "{searchQuery}"</p>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
           <div className="admin-navbar-right">
@@ -435,12 +590,21 @@ const AdminDashboard = () => {
               )}
             </div>
             <div className="navbar-profile">
-              <img 
-                src="/api/placeholder/32/32" 
-                alt="Admin Profile" 
-                className="profile-avatar"
-              />
-              <span className="profile-name">Admin</span>
+              <div className="admin-avatar">
+                <img 
+                  src="https://via.placeholder.com/40x40/4F46E5/ffffff?text=AD" 
+                  alt="Admin Profile" 
+                  className="profile-avatar"
+                  onError={(e) => {
+                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0RjQ2RTUiLz4KPHRleHQgeD0iMjAiIHk9IjI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSI+QUQ8L3RleHQ+Cjwvc3ZnPgo=";
+                  }}
+                />
+                <div className="admin-status-badge"></div>
+              </div>
+              <div className="profile-info">
+                <span className="profile-name">Admin</span>
+                <span className="profile-role">Administrator</span>
+              </div>
             </div>
             <button
               type="button"
@@ -486,50 +650,79 @@ const AdminDashboard = () => {
         <div className="admin-dashboard-main">
           <h3 className="admin-dashboard-title">Admin Dashboard</h3>
 
-          <table className="admin-dashboard-table">
-            <thead>
-              <tr className="bg-gray-800 text-white">
-                <th className="p-3">Product Image</th>
-                <th className="p-3">Product Name</th>
-                <th className="p-3">Product Price</th>
-                <th className="p-3">Product Category</th>
-          
-                <th className="p-3">Product Description</th>
-                <th className="p-3">Product Quantity</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="table-container" style={{overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}>
+            <div className="responsive-table">
+              {/* Header */}
+              <div className="table-header">
+                <div className="header-cell col-image">IMAGE</div>
+                <div className="header-cell col-name">PRODUCT NAME</div>
+                <div className="header-cell col-price">PRICE</div>
+                <div className="header-cell col-category">CATEGORY</div>
+                <div className="header-cell col-description">DESCRIPTION</div>
+                <div className="header-cell col-qty">QTY</div>
+                <div className="header-cell col-actions">ACTIONS</div>
+              </div>
+              
+              {/* Data Rows */}
               {products.map((singleProduct) => (
-                <tr key={singleProduct._id} className="bg-white hover:bg-gray-100">
-                  <td className="p-3">
+                <div key={singleProduct._id} id={`product-${singleProduct._id}`} className="table-row">
+                  <div className="data-cell col-image">
                     <img
-                      src={`https://localhost:5000/products/${singleProduct.productImage}`}
+                      src={`http://localhost:5001/products/${singleProduct.productImage}`}
                       alt={singleProduct.productName}
-                      onError={(e) => { e.target.src = '/path/to/placeholder-image.jpg'; }}
-                      className="w-24 h-12 object-cover rounded-md"
+                      onError={(e) => { 
+                        if (e.target.src.includes('5001')) {
+                          e.target.src = `https://localhost:5000/products/${singleProduct.productImage}`;
+                        }
+                      }}
+                      className="product-image-responsive"
                     />
-                  </td>
-                  <td className="p-3">{singleProduct.productName}</td>
-                  <td className="p-3">{singleProduct.productPrice}</td>
-                  <td className="p-3">{singleProduct.productCategory}</td>
-          
-                  <td className="p-3">{singleProduct.productDescription}</td>
-                  <td className="p-3">{singleProduct.productQuantity}</td>
-                  <td className="p-3">
-                    <div className="action-cell">
-                      <Link to={`/admin/update/${singleProduct._id}`} className="action-button">
-                        <FontAwesomeIcon icon={faEdit} className="text-blue-500 hover:text-blue-700 cursor-pointer" />
+                  </div>
+                  <div className="data-cell col-name">
+                    <span className="mobile-label">Product:</span>
+                    {singleProduct.productName}
+                  </div>
+                  <div className="data-cell col-price">
+                    <span className="mobile-label">Price:</span>
+                    <span className="price-text">Rs. {singleProduct.productPrice}</span>
+                  </div>
+                  <div className="data-cell col-category">
+                    <span className="mobile-label">Category:</span>
+                    <span className="category-badge-responsive">{singleProduct.productCategory}</span>
+                  </div>
+                  <div className="data-cell col-description">
+                    <span className="mobile-label">Description:</span>
+                    <span className="description-text">
+                      {singleProduct.productDescription.length > 50 
+                        ? singleProduct.productDescription.substring(0, 50) + "..."
+                        : singleProduct.productDescription}
+                    </span>
+                  </div>
+                  <div className="data-cell col-qty">
+                    <span className="mobile-label">Qty:</span>
+                    <span className="qty-text">{singleProduct.productQuantity}</span>
+                  </div>
+                  <div className="data-cell col-actions">
+                    <span className="mobile-label">Actions:</span>
+                    <div className="action-buttons-responsive">
+                      <Link 
+                        to={`/admin/update/${singleProduct._id}`} 
+                        className="btn-edit"
+                      >
+                        <FontAwesomeIcon icon={faEdit} />
                       </Link>
-                      <button onClick={() => handleDelete(singleProduct._id)} className="action-button">
-                        <FontAwesomeIcon icon={faTrash} className="text-red-500 hover:text-red-700 cursor-pointer" />
+                      <button 
+                        onClick={() => handleDelete(singleProduct._id)} 
+                        className="btn-delete"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
 
         {showForm && (
@@ -571,11 +764,22 @@ const AdminDashboard = () => {
                     >
                       <option value="select-option">Select Options</option>
                       <option value="Anklets">Anklets</option>
-                      <option value="Braclets">Braclets</option>
+                      <option value="Bracelets">Bracelets</option>
                       <option value="Earrings">Earrings</option>
                       <option value="Necklaces">Necklaces</option>
-                      
+                      <option value="Rings">Rings</option>
                     </select>
+                  </div>
+
+                  <div className="modal-form-group">
+                    <label>Product Material</label>
+                    <input
+                      type="text"
+                      value={productMaterial}
+                      onChange={(e) => setProductMaterial(e.target.value)}
+                      className="form-control"
+                      placeholder="Enter Product Material (e.g., Gold, Silver, Platinum)"
+                    />
                   </div>
 
                   

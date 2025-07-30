@@ -1,13 +1,23 @@
 import axios from "axios";
 
-// Creating backend Config
+// Creating backend Config - Try HTTP first for better compatibility
 const Api = axios.create({
-    baseURL: "https://localhost:5000",
+    baseURL: "http://localhost:5001", // Use HTTP port as primary
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     },
-    timeout: 10000 // 10 second timeout
+    timeout: 15000 // Increased timeout for better reliability
+});
+
+// HTTPS API as backup
+const ApiHTTPS = axios.create({
+    baseURL: "https://localhost:5000", // HTTPS as fallback
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    timeout: 15000
 });
 
 // Add request interceptor to check authentication
@@ -29,8 +39,17 @@ Api.interceptors.request.use(
 Api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.code === 'CERT_AUTHORITY_INVALID' || error.code === 'SELF_SIGNED_CERT_IN_CHAIN') {
+    // Handle SSL certificate issues
+    if (error.code === 'CERT_AUTHORITY_INVALID' || 
+        error.code === 'SELF_SIGNED_CERT_IN_CHAIN' ||
+        error.code === 'ERR_CERT_AUTHORITY_INVALID') {
       console.warn('Certificate issue detected. In production, use proper SSL certificates.');
+      console.error('SSL Error:', error.message);
+    }
+    
+    // Handle network errors
+    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+      console.error('Network error - backend server might not be running:', error.message);
     }
     
     if (error.response?.status === 401) {
@@ -38,6 +57,14 @@ Api.interceptors.response.use(
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
+    
+    // Log the full error for debugging
+    console.error('API Error:', {
+      message: error.message,
+      code: error.code,
+      response: error.response?.data,
+      status: error.response?.status
+    });
     
     return Promise.reject(error);
   }
@@ -116,31 +143,88 @@ export const clearAuthToken = () => {
 };
 
 // Test API
-export const testApi = () => Api.get('/test');
-
-// Register API
-export const registerUserApi = (data) => {
-    try {
-        return Api.post('/api/user/create', data);
-    } catch (error) {
-        console.error('Registration error:', error);
+export const testApi = () => {
+    console.log('Testing API connection to:', Api.defaults.baseURL);
+    return Api.get('/test').then(response => {
+        console.log('API test successful:', response.data);
+        return response;
+    }).catch(error => {
+        console.error('API test failed:', error.message);
         throw error;
+    });
+};
+
+// Register API with HTTP/HTTPS fallback
+export const registerUserApi = async (data) => {
+    console.log('Sending registration data:', { 
+        userName: data.userName, 
+        email: data.email, 
+        phone: data.phone 
+    });
+    
+    try {
+        // Try HTTP first (primary)
+        console.log('Trying HTTP registration...');
+        const response = await Api.post('/api/user/create', data);
+        console.log('Registration API success (HTTP):', response.data);
+        return response;
+    } catch (httpError) {
+        console.warn('HTTP registration failed, trying HTTPS:', httpError.message);
+        
+        try {
+            // Fallback to HTTPS
+            console.log('Trying HTTPS registration...');
+            const response = await ApiHTTPS.post('/api/user/create', data);
+            console.log('Registration API success (HTTPS):', response.data);
+            return response;
+        } catch (httpsError) {
+            console.error('Registration failed on both HTTP and HTTPS:', {
+                httpError: httpError.message,
+                httpsError: httpsError.message,
+                httpStatus: httpError.response?.status,
+                httpsStatus: httpsError.response?.status,
+                httpData: httpError.response?.data,
+                httpsData: httpsError.response?.data
+            });
+            
+            // Throw the more specific error
+            throw httpsError.response?.data ? httpsError : httpError;
+        }
     }
 };
 
-// Login API
+// Login API with HTTP/HTTPS fallback
 export const loginUserApi = async (data) => {
+    console.log('Attempting login with:', { email: data.email });
+    
     try {
-        console.log('Attempting login with:', { email: data.email });
+        // Try HTTP first
         const response = await Api.post('/api/user/login', data, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
+        console.log('Login successful (HTTP)');
         return response;
-    } catch (error) {
-        console.error('Login error:', error.response?.data || error.message);
-        throw error;
+    } catch (httpError) {
+        console.warn('HTTP login failed, trying HTTPS:', httpError.message);
+        
+        try {
+            // Fallback to HTTPS
+            const response = await ApiHTTPS.post('/api/user/login', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Login successful (HTTPS)');
+            return response;
+        } catch (httpsError) {
+            console.error('Login failed on both HTTP and HTTPS:', {
+                httpError: httpError.message,
+                httpsError: httpsError.message
+            });
+            throw httpsError.response?.data ? httpsError : httpError;
+        }
     }
 };
 
@@ -241,13 +325,33 @@ export const fetchUserDataApi = async () => {
     throw new Error("No token found in localStorage");
   }
 
-  const response = await Api.get("/api/user/current", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return response.data; // Return the response data
+  try {
+    // Try HTTP first
+    const response = await Api.get("/api/user/current", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (httpError) {
+    console.log('HTTP request failed, trying HTTPS:', httpError.message);
+    
+    try {
+      // Fallback to HTTPS
+      const response = await ApiHTTPS.get("/api/user/current", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (httpsError) {
+      console.error('Both HTTP and HTTPS failed for fetchUserData:', {
+        httpError: httpError.message,
+        httpsError: httpsError.message
+      });
+      throw new Error("Failed to fetch user data from both HTTP and HTTPS endpoints");
+    }
+  }
 };
 
 export const updateUserProfileApi = async (data) => {
@@ -256,8 +360,25 @@ export const updateUserProfileApi = async (data) => {
     throw new Error("No token found in localStorage");
   }
 
-  const response = await Api.put("/api/user/update", data, getConfig());
-  return response.data;
+  try {
+    // Try HTTP first
+    const response = await Api.put("/api/user/update", data, getConfig());
+    return response.data;
+  } catch (httpError) {
+    console.log('HTTP request failed for updateUserProfile, trying HTTPS:', httpError.message);
+    
+    try {
+      // Fallback to HTTPS
+      const response = await ApiHTTPS.put("/api/user/update", data, getConfig());
+      return response.data;
+    } catch (httpsError) {
+      console.error('Both HTTP and HTTPS failed for updateUserProfile:', {
+        httpError: httpError.message,
+        httpsError: httpsError.message
+      });
+      throw new Error("Failed to update user profile from both HTTP and HTTPS endpoints");
+    }
+  }
 };
 
 // Profile Picture Upload API
@@ -267,9 +388,25 @@ export const uploadProfilePictureApi = async (formData) => {
     throw new Error("No token found in localStorage");
   }
 
-  const response = await Api.post("/api/user/profile_picture", formData, getFileConfig());
-
-  return response.data;
+  try {
+    // Try HTTP first
+    const response = await Api.post("/api/user/profile_picture", formData, getFileConfig());
+    return response.data;
+  } catch (httpError) {
+    console.log('HTTP request failed for uploadProfilePicture, trying HTTPS:', httpError.message);
+    
+    try {
+      // Fallback to HTTPS
+      const response = await ApiHTTPS.post("/api/user/profile_picture", formData, getFileConfig());
+      return response.data;
+    } catch (httpsError) {
+      console.error('Both HTTP and HTTPS failed for uploadProfilePicture:', {
+        httpError: httpError.message,
+        httpsError: httpsError.message
+      });
+      throw new Error("Failed to upload profile picture from both HTTP and HTTPS endpoints");
+    }
+  }
 };
 
 // Cart APIs
@@ -328,32 +465,62 @@ export const updateOrderStatusApi = (id, data) => Api.post(`/api/order/update_or
 export const getOrdersByUserApi = () => Api.get("/api/order/get_orders_by_user", getConfig());
 
 // Function to initialize Khalti payment
-export const initializeKhaltiPaymentApi = (data) => Api.post("api/khalti/initialize-khalti", data);
+export const initializeKhaltiPaymentApi = (data) => Api.post("api/khalti/initialize-khalti", data, getConfig());
+
+// Function to test simple Khalti payment
+export const initializeSimpleKhaltiPaymentApi = (data) => Api.post("api/khalti/initialize-khalti-simple", data);
+
+// Function to test Khalti configuration
+export const testKhaltiConfigApi = () => Api.get("/api/khalti/test-khalti");
+
+// Function to debug Khalti API
+export const debugKhaltiApi = (data) => Api.post("/api/khalti/debug-khalti", data);
 
 // Function to verify Khalti payment
 export const verifyKhaltiPaymentApi = (params) => Api.get("/api/khalti/complete-khalti-payment", { params });
 
 const KhaltiApi = axios.create({
-    baseURL: "https://test-pay.khalti.com/",
+    baseURL: "https://a.khalti.com/",
     headers: {
         "Content-Type": "application/json",
-        authorization: `key 45615eee5f444d8186bce4b1766896fa`,
+        authorization: `key c471e0d4a7104413b5b084d397396656`,
     },
 });
 
 
 
 export const fetchActivityLogsApi = async () => {
-  const token = localStorage.getItem("token");
-  const response = await axios.get(
-    "https://localhost:5000/api/logs/activity-logs",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  console.log('Fetching activity logs...');
+  
+  try {
+    // Try HTTP first (primary)
+    console.log('Trying HTTP activity logs...');
+    const response = await Api.get('/api/logs/activity-logs', getJsonConfig());
+    console.log('Activity logs API success (HTTP):', response.data);
+    return response.data.logs;
+  } catch (httpError) {
+    console.warn('HTTP activity logs failed, trying HTTPS:', httpError.message);
+    
+    try {
+      // Fallback to HTTPS
+      console.log('Trying HTTPS activity logs...');
+      const response = await ApiHTTPS.get('/api/logs/activity-logs', getJsonConfig());
+      console.log('Activity logs API success (HTTPS):', response.data);
+      return response.data.logs;
+    } catch (httpsError) {
+      console.error('Activity logs failed on both HTTP and HTTPS:', {
+        httpError: httpError.message,
+        httpsError: httpsError.message,
+        httpStatus: httpError.response?.status,
+        httpsStatus: httpsError.response?.status,
+        httpData: httpError.response?.data,
+        httpsData: httpsError.response?.data
+      });
+      
+      // Throw the more specific error
+      throw httpsError.response?.data ? httpsError : httpError;
     }
-  );
-  return response.data.logs;
+  }
 };
 
 // Get dashboard notifications from real data

@@ -74,8 +74,8 @@ const Homepage = () => {
       {/* Hero Banner */}
       <div className="hero-banner">
         <div className="hero-content">
-          <h1>Discover Premium Beauty</h1>
-          <p>Explore our curated collection of luxury cosmetics and skincare products</p>
+          <h1>Discover Exquisite Jewelry</h1>
+          <p>Explore our curated collection of elegant necklaces, earrings, bracelets, and more</p>
         </div>
       </div>
       

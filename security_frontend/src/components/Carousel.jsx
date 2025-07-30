@@ -27,8 +27,10 @@ const Carousel = () => {
 
       intervalRef.current = setInterval(() => {
         currentIndex = (currentIndex + 1) % items.length;
-        carouselRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
-      }, 3000);
+        if (carouselRef.current) {
+          carouselRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+      }, 4000); // Increased to 4 seconds for better visibility
     }
   };
 
@@ -44,13 +46,40 @@ const Carousel = () => {
     <div className="carousel-container">
       <div className="carousel" ref={carouselRef}>
         <div className="carousel-item">
-          <img src={carousel1} alt="Slide 1" className="carousel-img" />
+          <img 
+            src={carousel1} 
+            alt="Slide 1" 
+            className="carousel-img"
+            onError={(e) => {
+              console.log('Error loading carousel1');
+              e.target.style.display = 'none';
+            }}
+            onLoad={() => console.log('Carousel1 loaded successfully')}
+          />
         </div>
         <div className="carousel-item">
-          <img src={carousel2} alt="Slide 2" className="carousel-img" />
+          <img 
+            src={carousel2} 
+            alt="Slide 2" 
+            className="carousel-img"
+            onError={(e) => {
+              console.log('Error loading carousel2');
+              e.target.style.display = 'none';
+            }}
+            onLoad={() => console.log('Carousel2 loaded successfully')}
+          />
         </div>
         <div className="carousel-item">
-          <img src={carousel3} alt="Slide 3" className="carousel-img" />
+          <img 
+            src={carousel3} 
+            alt="Slide 3" 
+            className="carousel-img"
+            onError={(e) => {
+              console.log('Error loading carousel3');
+              e.target.style.display = 'none';
+            }}
+            onLoad={() => console.log('Carousel3 loaded successfully')}
+          />
         </div>
       </div>
       <div className="carousel-buttons">
