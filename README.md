@@ -1,4 +1,4 @@
-# ✨ SparkleNest - Premium Cosmetics E-commerce Platform
+# ✨ SparkleNest - Premium Jwellery E-commerce Platform
 
 **Where beauty meets luxury.** Discover our curated collection of premium c## 🎯 Latest FeaturAPI endpoints will be accessible for frontend integration.
 
