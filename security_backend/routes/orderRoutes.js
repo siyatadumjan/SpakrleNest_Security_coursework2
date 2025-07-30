@@ -7,24 +7,25 @@ const orderController = require("../controllers/orderControllers");
 
 // Import authentication middleware
 const { authGuard, adminGuard } = require("../middleware/authGuard");
+const { logRequest } = require("../middleware/ActivityLog");
 
 /**
  * @route   POST /place_order
  * @desc    Place a new order (requires authentication)
  */
-router.post("/place_order", authGuard, orderController.placeOrder);
+router.post("/place_order", authGuard, logRequest, orderController.placeOrder);
 
 /**
  * @route   GET /get_all_orders
  * @desc    Get all orders (admin or public view)
  */
-router.get("/get_all_orders", orderController.getAllOrders);
+router.get("/get_all_orders", adminGuard, logRequest, orderController.getAllOrders);
 
 /**
  * @route   GET /get_orders_by_user
  * @desc    Get all orders for the authenticated user
  */
-router.get("/get_orders_by_user", authGuard, orderController.getOrdersByUser);
+router.get("/get_orders_by_user", authGuard, logRequest, orderController.getOrdersByUser);
 
 /**
  * @route   POST /update_order_status/:orderId
@@ -33,35 +34,9 @@ router.get("/get_orders_by_user", authGuard, orderController.getOrdersByUser);
 router.post(
   "/update_order_status/:orderId",
   adminGuard,
+  logRequest,
   orderController.updateOrderStatus
 );
 
 // Export the router for use in the main app
 module.exports = router;
-
-
-
-// const router = require("express").Router();
-
-// const orderController = require("../controllers/orderControllers");
-// const { logRequest } = require("../middleware/ActivityLog");
-
-// const { authGuard, adminGuard } = require("../middleware/authGuard");
-
-// // Place an order
-// router.post("/place_order", authGuard, logRequest,orderController.placeOrder);
-
-// // Route to get all orders
-// router.get("/get_all_orders", orderController.getAllOrders);
-
-// // Route to get orders by user
-// router.get("/get_orders_by_user", authGuard,logRequest, orderController.getOrdersByUser);
-
-// // Route to update order status
-// router.post(
-//   "/update_order_status/:orderId",
-//   adminGuard,
-//   orderController.updateOrderStatus
-// );
-
-// module.exports = router;

@@ -1,9 +1,9 @@
-// const {
-//     initializeKhaltiPayment,
-//     verifyKhaltiPayment,
-// } = require("../service/khaltiService");
-// const Payment = require("../models/paymentModel");
-// const OrderModel = require("../models/orderModel");
+const {
+    initializeKhaltiPayment,
+    verifyKhaltiPayment,
+} = require("../service/khaltiService");
+const Payment = require("../models/paymentModel");
+const OrderModel = require("../models/orderModel");
 
 // // Route to initialize Khalti payment gateway
 // const initializePayment = async (req, res) => {
@@ -162,20 +162,20 @@
 // module.exports = { initializePayment, completeKhaltiPayment };
 
 
-
-const {
-  initializeKhaltiPayment,
-  verifyKhaltiPayment,
-} = require("../service/khaltiService");
-const Payment = require("../models/paymentModel");
-const OrderModel = require("../models/orderModel");
- 
 // Route to initialize Khalti payment gateway
 const initializePayment = async (req, res) => {
-  console.log(req.body);
+  console.log('Payment initialization request:', req.body);
  
   try {
     const { orderId, totalPrice, website_url } = req.body;
+
+    // Validate required fields
+    if (!orderId || !totalPrice) {
+      return res.json({
+        success: false,
+        message: "Missing required fields: orderId or totalPrice",
+      });
+    }
  
     // Find the order and populate the products field
     const itemData = await OrderModel.findOne({
@@ -192,23 +192,39 @@ const initializePayment = async (req, res) => {
       });
  
     if (!itemData) {
-      return res.send({
+      return res.json({
         success: false,
-        message: "Order not found",
+        message: "Order not found or price mismatch",
       });
     }
-    console.log(itemData.carts);
-    // Extract product names from populated products array
-    const productNames = itemData.carts
-      .map((p) => p.productId.productName)
-      .join(", ");
- 
-    if (!productNames) {
-      return res.send({
-        success: false,
-        message: "No product names found",
-      });
+    
+    console.log('Order found:', itemData._id);
+    console.log('Cart items:', itemData.carts?.length || 0);
+    
+    // Extract product names from populated products array with better error handling
+    let productNames = "Test Products";
+    try {
+      if (itemData.carts && itemData.carts.length > 0) {
+        const validCarts = itemData.carts.filter(cart => 
+          cart.productId && cart.productId.productName
+        );
+        
+        if (validCarts.length > 0) {
+          productNames = validCarts
+            .map((p) => p.productId.productName)
+            .join(", ");
+        } else {
+          productNames = `Order ${orderId}`;
+        }
+      } else {
+        productNames = `Order ${orderId}`;
+      }
+    } catch (error) {
+      console.error('Error extracting product names:', error);
+      productNames = `Order ${orderId}`;
     }
+
+    console.log('Product names for payment:', productNames);
  
     // Create a payment document without transactionId initially
     const OrderModelData = await Payment.create({
@@ -219,6 +235,14 @@ const initializePayment = async (req, res) => {
     });
  
     // Initialize the Khalti payment
+    console.log('Initializing Khalti payment with:', {
+      amount: totalPrice * 100,
+      purchase_order_id: OrderModelData._id,
+      purchase_order_name: productNames,
+      return_url: `${process.env.BACKEND_URI}/api/khalti/complete-khalti-payment`,
+      website_url: website_url || "http://localhost:3000",
+    });
+
     const paymentInitate = await initializeKhaltiPayment({
       amount: totalPrice * 100, // amount should be in paisa (Rs * 100)
       purchase_order_id: OrderModelData._id, // purchase_order_id because we need to verify it later
@@ -226,6 +250,8 @@ const initializePayment = async (req, res) => {
       return_url: `${process.env.BACKEND_URI}/api/khalti/complete-khalti-payment`,
       website_url: website_url || "http://localhost:3000",
     });
+
+    console.log('Khalti payment response:', paymentInitate);
  
     // Update the payment record with the transactionId and pidx
     await Payment.updateOne(
@@ -245,9 +271,14 @@ const initializePayment = async (req, res) => {
       pidx: paymentInitate.pidx,
     });
   } catch (error) {
+    console.error('Payment initialization error:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    
     res.json({
       success: false,
-      error: error.message || "An error occurred",
+      message: "Failed to initialize payment",
+      error: error.response?.data?.detail || error.message || "An error occurred",
+      details: error.response?.data || null
     });
   }
 };
@@ -309,7 +340,7 @@ const completeKhaltiPayment = async (req, res) => {
       },
       { new: true }
     );
-    res.redirect(`https://test-pay.khalti.com/?pidx=${pidx}`);
+    res.redirect(`https://a.khalti.com/?pidx=${pidx}`);
  
     // // Send success response
     // res.json({

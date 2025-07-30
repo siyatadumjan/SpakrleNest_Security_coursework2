@@ -13,14 +13,14 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    productSkinType: {
+    productMaterial: {
         type: String,
-        required: true
+        required: false, // Optional field for jewelry material (gold, silver, etc.)
     },
     productDescription: {
         type: String,
         required: true,
-        maxLength: 500
+        maxLength: 1000 // Increased limit for detailed jewelry descriptions
     },
     productImage: {
         type: String,

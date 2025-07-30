@@ -33,6 +33,7 @@ const createUser = [
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation error',
@@ -41,11 +42,14 @@ const createUser = [
     }
 
     const { userName, email, password, phone } = req.body;
+    
+    console.log('Registration attempt for:', { email, userName, phone });
 
     try {
       // Check if the user already exists
       const existingUser = await userModel.findOne({ email });
       if (existingUser) {
+        console.log('User already exists:', email);
         return res.status(409).json({ success: false, message: 'User Already Exists!' });
       }
 
@@ -56,6 +60,8 @@ const createUser = [
       // Generate OTP and expiration time
       const otp = crypto.randomInt(100000, 999999).toString(); // 6-digit OTP
       const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes from now
+
+      console.log('Generated OTP for', email, ':', otp);
 
       // Create a new user
       const newUser = new userModel({
@@ -70,20 +76,54 @@ const createUser = [
       });
 
       await newUser.save();
+      console.log('User saved successfully:', email);
 
       // Send the verification email
       const emailSent = await sendVerificationEmail(email, otp);
       if (!emailSent) {
+        console.log('Failed to send verification email to:', email);
         return res.status(500).json({ success: false, message: 'Failed to send verification email' });
       }
 
+      console.log('Verification email sent successfully to:', email);
       res.status(200).json({
         success: true,
         message: 'User created successfully. Please verify your email to activate your account.',
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: 'Internal Server Error' });
+      console.error('Registration error:', error);
+      
+      // Handle specific MongoDB errors
+      if (error.code === 11000) {
+        return res.status(409).json({ 
+          success: false, 
+          message: 'Email already exists. Please use a different email address.' 
+        });
+      }
+      
+      // Handle validation errors
+      if (error.name === 'ValidationError') {
+        const validationErrors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Validation failed',
+          errors: validationErrors
+        });
+      }
+      
+      // Handle database connection errors
+      if (error.name === 'MongoNetworkError' || error.name === 'MongooseServerSelectionError') {
+        return res.status(503).json({ 
+          success: false, 
+          message: 'Database connection error. Please try again later.' 
+        });
+      }
+      
+      res.status(500).json({ 
+        success: false, 
+        message: 'Internal Server Error. Please try again later.',
+        ...(process.env.NODE_ENV === 'development' && { error: error.message })
+      });
     }
   },
 ];
@@ -167,9 +207,11 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Clear OTP after successful verification
+    // Clear OTP after successful verification and reset failed attempts
     user.loginOTP = null;
     user.loginOTPExpires = null;
+    user.failedLoginAttempts = 0; // Reset failed attempts on successful login
+    user.lockoutTime = null; // Clear any lockout
     await user.save();
 
     const token = jwt.sign(
@@ -215,8 +257,8 @@ const loginOtp = async (req, res) => {
     }
  
     // Reset login attempts and clear OTP
-    user.loginAttempts = 0;
-    user.lockUntil = undefined;
+    user.failedLoginAttempts = 0; // Use correct field name
+    user.lockoutTime = null; // Use correct field name  
     user.loginOTP = null;
     user.loginOTPExpires = null;
     await user.save();
